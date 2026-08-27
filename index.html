@@ -112,6 +112,8 @@ td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; fo
 .acc-lo{background:var(--bad-bg); color:var(--bad);}
 .wordrow{display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); align-items:baseline;}
 .wordrow:last-child{border-bottom:0;}
+.wordex{font-size:.88rem; color:var(--muted); font-style:italic; margin-top:3px;
+  border-left:3px solid var(--line); padding-left:9px;}
 textarea{width:100%; min-height:110px; border-radius:12px; border:2px solid var(--line); background:var(--surface2);
   color:var(--ink); font-family:inherit; font-size:.9rem; padding:10px;}
 .savebanner{display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--accent);
@@ -256,6 +258,7 @@ ul.tricky b{font-family:Fredoka,sans-serif; font-weight:600;}
 {"id":"assortment-1","word":"assortment","pos":"noun","meaning":"a group of things or people that are similar but have some recognisable differences","example":"We ate an assorment of chocolate.","added":"2026-08-10"}
 ]}</script>
 
+<script src="sentences.js"></script>
 <script src="generate.js"></script>
 <script>
 (function(){
@@ -1409,6 +1412,13 @@ function wordsView(){
     '<div id="dyn-words">' + wordsDyn() + '</div></div>';
 }
 
+function exampleFor(item){
+  // Precomputed sentence first; fall back to whatever the sheet supplies for
+  // words added since the file was generated.
+  var s = (window.SENTENCES || {})[item.id];
+  return s || item.example || '';
+}
+
 function wordsDyn(){
   var b = browse.words;
   var r = applyBrowse(wordEntries(), b);
@@ -1419,7 +1429,11 @@ function wordsDyn(){
     return '<div class="wordrow"><div><b style="font-family:Fredoka,sans-serif;">' + esc(e.word) + '</b> ' +
       posChip(e.items[0].pos) +
       (e.seen === 0 ? ' <span class="chip" style="background:var(--surface2);">not practiced yet</span>' : '') +
-      e.items.map(function(i){ return '<div class="explain">' + esc(i.meaning) + '</div>'; }).join('') +
+      e.items.map(function(i){
+        var ex = exampleFor(i);
+        return '<div class="explain">' + esc(i.meaning) + '</div>' +
+          (ex ? '<div class="wordex">&ldquo;' + esc(ex) + '&rdquo;</div>' : '');
+      }).join('') +
       '</div><div class="dots">' + dots + '</div></div>';
   }).join('') : '<div class="emptylist">No words match “' + esc(b.q) + '”.</div>';
 
