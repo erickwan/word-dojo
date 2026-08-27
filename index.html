@@ -1,0 +1,1691 @@
+<meta charset="utf-8">
+<title>Jax's Word Dojo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+  --bg:#F4F1EC; --surface:#FFFFFF; --surface2:#EDE6DC; --ink:#26221D; --muted:#6E6459;
+  --brand:#E4711E; --brand-deep:#B4530E; --brand-soft:#FBE3CE; --on-brand:#FFFFFF;
+  --accent:#2F6FD0; --accent-deep:#1F4E96;
+  --good:#2C9C5A; --good-bg:#E2F4E9; --bad:#DE5033; --bad-bg:#FBE9E3;
+  --line:#DED3C4; --shadow:rgba(60,45,25,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#191512; --surface:#241E19; --surface2:#322A22; --ink:#F3EDE5; --muted:#B0A294;
+    --brand:#F08B3C; --brand-deep:#6B3308; --brand-soft:#402A18; --on-brand:#1A0E05;
+    --accent:#6FA6F0; --accent-deep:#1F4E96;
+    --good:#4CC97E; --good-bg:#153826; --bad:#FF8261; --bad-bg:#3D211A;
+    --line:#463A2E; --shadow:rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#191512; --surface:#241E19; --surface2:#322A22; --ink:#F3EDE5; --muted:#B0A294;
+  --brand:#F08B3C; --brand-deep:#6B3308; --brand-soft:#402A18; --on-brand:#1A0E05;
+  --accent:#6FA6F0; --accent-deep:#1F4E96;
+  --good:#4CC97E; --good-bg:#153826; --bad:#FF8261; --bad-bg:#3D211A;
+  --line:#463A2E; --shadow:rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); margin:0; padding:0 16px 48px;
+  font-family:"Atkinson Hyperlegible", "Trebuchet MS", Verdana, sans-serif; font-size:17px; line-height:1.5;}
+h1,h2,h3,.display{font-family:Fredoka, "Comic Sans MS", "Trebuchet MS", sans-serif; font-weight:600; letter-spacing:.2px; text-wrap:balance;}
+.wrap{max-width:660px; margin:0 auto;}
+header.app{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 0 14px;}
+.logo{display:flex; align-items:center; gap:10px; font-family:Fredoka,sans-serif; font-weight:600; font-size:1.35rem;}
+.logo .mark{width:38px;height:38px;border-radius:12px;background:var(--brand);color:var(--on-brand);
+  display:grid;place-items:center;font-size:1.25rem; box-shadow:0 3px 0 var(--brand-deep); font-weight:600;}
+.tabs{display:flex; gap:6px; background:var(--surface2); border-radius:14px; padding:5px; width:max-content; margin:0 auto 22px;}
+.tabs button{border:0; background:transparent; color:var(--muted); font-family:Fredoka,sans-serif; font-weight:500;
+  font-size:.95rem; padding:8px 16px; border-radius:10px; cursor:pointer;}
+.tabs button.on{background:var(--surface); color:var(--ink); box-shadow:0 2px 6px var(--shadow);}
+.card{background:var(--surface); border:2px solid var(--line); border-radius:18px; padding:22px; box-shadow:0 4px 0 var(--line); margin-bottom:18px;}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:14px; cursor:pointer;
+  font-family:Fredoka,sans-serif; font-weight:500; font-size:1.05rem; padding:13px 22px;
+  background:var(--surface); color:var(--ink); border:2px solid var(--line); box-shadow:0 3px 0 var(--line);}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 var(--line);}
+.btn.primary{background:var(--brand); color:var(--on-brand); border-color:var(--brand-deep); box-shadow:0 4px 0 var(--brand-deep); font-size:1.15rem; padding:15px 26px;}
+.btn.primary:active{box-shadow:0 1px 0 var(--brand-deep);}
+.btn.accent{background:var(--accent); color:#231a00; border-color:var(--accent-deep); box-shadow:0 4px 0 var(--accent-deep);}
+.btn:focus-visible,.tabs button:focus-visible,.opt:focus-visible,.tile:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+.btn[disabled]{opacity:.55; cursor:default;}
+.big-num{font-family:Fredoka,sans-serif; font-weight:600; font-size:2.6rem; line-height:1;}
+.muted{color:var(--muted);}
+.center{text-align:center;}
+.home-hero{padding:30px 22px;}
+.tilerow{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:18px;}
+.tile{background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:14px 16px;}
+.tile .v{font-family:Fredoka,sans-serif; font-weight:600; font-size:1.7rem; font-variant-numeric:tabular-nums;}
+.tile .l{color:var(--muted); font-size:.85rem;}
+.chip{display:inline-block; border-radius:999px; padding:2px 10px; font-size:.8rem; font-weight:700;}
+.pos-noun{background:rgba(52,130,208,.16);}
+.pos-verb{background:rgba(222,80,51,.16);}
+.pos-adjective{background:rgba(245,168,0,.20);}
+.pos-adverb{background:rgba(150,90,220,.16);}
+.qword{font-family:Fredoka,sans-serif; font-weight:600; font-size:2.1rem; margin:6px 0 2px;}
+.qask{color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:.78rem;}
+.opts{display:flex; flex-direction:column; gap:10px; margin-top:16px;}
+.opt{text-align:left; font-size:1rem; line-height:1.4; padding:13px 16px; border-radius:14px; cursor:pointer;
+  background:var(--surface2); color:var(--ink); border:2px solid var(--line); font-family:inherit;}
+.opt:hover{border-color:var(--brand);}
+.opt.right{background:var(--good-bg); border-color:var(--good);}
+.opt.wrong{background:var(--bad-bg); border-color:var(--bad);}
+.opt[disabled]{cursor:default;}
+.sentence{font-size:1.15rem; line-height:1.7; margin:10px 0;}
+.blank{display:inline-block; min-width:90px; border-bottom:3px solid var(--brand); text-align:center; font-weight:700; color:var(--brand);}
+.typebox{display:flex; gap:10px; margin-top:14px;}
+.typebox input{flex:1; font-family:Fredoka,sans-serif; font-size:1.2rem; padding:11px 14px; border-radius:12px;
+  border:2px solid var(--line); background:var(--surface2); color:var(--ink); min-width:0;}
+.typebox input:focus-visible{outline:3px solid var(--accent); outline-offset:1px;}
+.tiles{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+.tile-btn{width:46px;height:50px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);
+  font-family:Fredoka,sans-serif;font-weight:600;font-size:1.3rem;color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--line);}
+.tile-btn[disabled]{opacity:.25; box-shadow:none;}
+.slots{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; min-height:52px; align-items:center;}
+.slot{width:40px;height:48px;border-radius:10px;border:2px dashed var(--line);display:grid;place-items:center;
+  font-family:Fredoka,sans-serif;font-weight:600;font-size:1.3rem;}
+.slot.filled{border-style:solid; background:var(--brand-soft); border-color:var(--brand);}
+.fb{border-radius:14px; padding:14px 16px; margin-top:16px; font-weight:700; border:2px solid;}
+.fb.good{background:var(--good-bg); border-color:var(--good);}
+.fb.bad{background:var(--bad-bg); border-color:var(--bad);}
+.fb .note{font-weight:400; margin-top:4px;}
+.progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+.pbar{flex:1; height:10px; border-radius:999px; background:var(--surface2); overflow:hidden;}
+.pbar div{height:100%; background:var(--brand); border-radius:999px; transition:width .3s;}
+.streak{font-family:Fredoka,sans-serif; font-weight:600; color:var(--accent-deep);}
+:root[data-theme="dark"] .streak{color:var(--accent);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .streak{color:var(--accent);}}
+.stars{font-size:2.4rem; letter-spacing:.1em; color:var(--accent);}
+.stars .off{color:var(--surface2); -webkit-text-stroke:1px var(--line);}
+table{border-collapse:collapse; width:100%; font-size:.92rem;}
+th{color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:.72rem; text-align:left; padding:8px 10px; border-bottom:2px solid var(--line);}
+td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; font-variant-numeric:tabular-nums;}
+.tblwrap{overflow-x:auto;}
+.dots{white-space:nowrap; letter-spacing:2px; font-size:.8rem;}
+.dots .on{color:var(--brand);}
+.dots .offd{color:var(--line);}
+.acc-pill{border-radius:999px; padding:2px 9px; font-weight:700; font-size:.8rem; white-space:nowrap;}
+.acc-hi{background:var(--good-bg); color:var(--good);}
+.acc-mid{background:rgba(245,168,0,.2); color:var(--accent-deep);}
+:root[data-theme="dark"] .acc-mid{color:var(--accent);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .acc-mid{color:var(--accent);}}
+.acc-lo{background:var(--bad-bg); color:var(--bad);}
+.wordrow{display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); align-items:baseline;}
+.wordrow:last-child{border-bottom:0;}
+textarea{width:100%; min-height:110px; border-radius:12px; border:2px solid var(--line); background:var(--surface2);
+  color:var(--ink); font-family:inherit; font-size:.9rem; padding:10px;}
+.savebanner{display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--accent);
+  color:#231a00; border-radius:14px; padding:10px 16px; margin-bottom:16px; font-weight:700;}
+.savebanner .btn{padding:8px 14px; font-size:.95rem;}
+.explain{font-size:.9rem; color:var(--muted);}
+ul.tricky{padding-left:0; list-style:none; margin:10px 0 0;}
+ul.tricky li{padding:8px 0; border-bottom:1px solid var(--line);}
+ul.tricky li:last-child{border-bottom:0;}
+ul.tricky b{font-family:Fredoka,sans-serif; font-weight:600;}
+/* --- list browsing toolbar (My words / Parent) --- */
+.toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0 6px;}
+.toolbar input.search{flex:1 1 190px; min-width:0; padding:9px 12px; border-radius:12px;
+  border:2px solid var(--line); background:var(--surface2); color:var(--ink); font-family:inherit; font-size:.95rem;}
+.toolbar input.search:focus-visible{outline:3px solid var(--accent); outline-offset:1px;}
+.toolbar select{padding:9px 10px; border-radius:12px; border:2px solid var(--line);
+  background:var(--surface2); color:var(--ink); font-family:inherit; font-size:.88rem; cursor:pointer;}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+.chipbtn{border:2px solid var(--line); background:var(--surface); color:var(--muted); border-radius:999px;
+  padding:5px 12px; font-size:.85rem; font-weight:700; cursor:pointer; font-family:inherit;}
+.chipbtn:hover{border-color:var(--brand);}
+.chipbtn.on{background:var(--brand); color:var(--on-brand); border-color:var(--brand-deep);}
+.chipbtn .n{opacity:.7; font-weight:400; margin-left:4px;}
+.resultcount{color:var(--muted); font-size:.85rem; margin:2px 0 6px;}
+.emptylist{color:var(--muted); text-align:center; padding:26px 10px;}
+.showmore{display:block; margin:14px auto 0;}
+.tblwrap.tall{max-height:60vh; overflow-y:auto;}
+.tblwrap td:not(:first-child), .tblwrap th:not(:first-child){white-space:nowrap;}
+.tblwrap td:first-child{min-width:150px;}
+@media (max-width:560px){
+  .tblwrap td:first-child{min-width:0;}
+  .wordtbl .dots{letter-spacing:0; font-size:.7rem;}
+  .wordtbl th, .wordtbl td{padding:8px 6px;}
+  .wordtbl td:nth-child(4), .wordtbl th:nth-child(4),
+  .wordtbl td:nth-child(5), .wordtbl th:nth-child(5){display:none;}
+}
+.tblwrap.tall thead th{position:sticky; top:0; background:var(--surface); z-index:1;}
+.grouphdr{display:flex; align-items:baseline; gap:8px; margin:16px 0 2px; padding-top:10px; border-top:2px solid var(--line);}
+.grouphdr:first-of-type{border-top:0; padding-top:0; margin-top:4px;}
+.grouphdr h3{margin:0; font-size:1rem;}
+.grouphdr .n{color:var(--muted); font-size:.85rem;}
+/* --- power-up end-of-round scene --- */
+.pw-scene{position:relative; display:flex; justify-content:center; margin:2px 0; min-height:210px; overflow:hidden; border-radius:14px;}
+.pw-fighter{width:170px; height:auto; position:relative; z-index:2;}
+.clip-wrap{position:relative; z-index:2;}
+.clip-wrap picture{display:block;}
+.clip-img{height:auto; display:block; border-radius:14px;}
+.pw-gif{max-height:200px; width:auto; max-width:86%; margin:0 auto;}
+.dragon-gif{width:100%; max-width:320px; margin:0 auto;}
+.pw-scene canvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1;}
+@keyframes pw-brace{
+  0%{transform:translateY(0) scaleY(1);}
+  20%{transform:translateY(5px) scaleY(.95);}
+  55%{transform:translateY(-4px) scaleY(1.03);}
+  100%{transform:translateY(0) scaleY(1);}
+}
+@keyframes pw-shake{
+  0%,100%{transform:translateX(0);} 20%{transform:translateX(-3px);}
+  40%{transform:translateX(3px);} 60%{transform:translateX(-2px);} 80%{transform:translateX(2px);}
+}
+@keyframes pw-flash{ 0%{opacity:0;} 12%{opacity:.85;} 100%{opacity:0;} }
+@keyframes pw-pop{ from{opacity:0; transform:scale(.7) translateY(10px);} to{opacity:1; transform:none;} }
+.pw-fighter{animation:pw-brace 1.1s cubic-bezier(.3,1.2,.5,1) both;}
+.pw-ssj .pw-scene{animation:pw-shake .5s ease-in-out .35s 3;}
+.pw-flash{position:absolute; inset:0; background:radial-gradient(circle at 50% 62%, #fff6c9 0%, #ffd23f 35%, transparent 70%);
+  z-index:3; pointer-events:none; animation:pw-flash 1.1s ease-out .3s both;}
+.ki-earned{display:inline-flex; align-items:center; gap:6px; font-family:Fredoka,sans-serif; font-weight:600;
+  color:#0b6f8c; background:rgba(62,139,255,.14); border-radius:999px; padding:4px 14px; margin-top:2px;
+  animation:pw-pop .5s ease-out .7s both;}
+:root[data-theme="dark"] .ki-earned{color:#8fd4ff;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ki-earned{color:#8fd4ff;}}
+/* --- dragon ball hunt --- */
+.db-row{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:12px 0 4px;}
+.db-slot{width:46px; height:46px; border-radius:50%;}
+.db-slot.empty{border:2px dashed var(--line); background:var(--surface2); opacity:.55;}
+@keyframes db-appear{ from{opacity:0; transform:scale(.4) rotate(-40deg);} to{opacity:1; transform:none;} }
+.db-slot.filled{animation:db-appear .45s cubic-bezier(.3,1.5,.5,1) both;}
+@keyframes db-glow{ 0%,100%{filter:drop-shadow(0 0 2px rgba(255,170,40,.6));} 50%{filter:drop-shadow(0 0 9px rgba(255,170,40,.95));} }
+.db-ready .db-slot.filled{animation:db-appear .45s cubic-bezier(.3,1.5,.5,1) both, db-glow 1.6s ease-in-out .5s infinite;}
+.dragon-stage{position:relative; min-height:210px; display:flex; align-items:center; justify-content:center;}
+@keyframes dg-rise{ from{opacity:0; transform:translateY(40px) scale(.9);} to{opacity:1; transform:none;} }
+.dragon-stage svg{animation:dg-rise 1s cubic-bezier(.2,1,.4,1) both;}
+@media (prefers-reduced-motion: reduce){
+  .pw-fighter,.pw-ssj .pw-scene,.pw-flash,.db-slot.filled,.db-ready .db-slot.filled,.dragon-stage svg{animation:none;}
+  .pw-flash{display:none;}
+}
+#confetti{position:fixed; inset:0; pointer-events:none;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+@media (max-width:480px){
+  .card{padding:16px;}
+  .qword{font-size:1.7rem;}
+  body{font-size:16px;}
+}
+</style>
+
+<div id="root" class="wrap"></div>
+
+<script type="application/json" id="app-state">{"savedAt":0,"sessions":[],"stats":{},"items":[
+{"id":"allegation-1","word":"allegation","pos":"noun","meaning":"a claim of wrongdoing, usually without proof","example":"Most people thought the allegation about Steve robing the bank was false.","added":"2026-07-13"},
+{"id":"bemoan-1","word":"bemoan","pos":"verb","meaning":"to express regret, sorrow or dissatisfaction about something","example":"Steve bemoaned about not spending time with his dad before he passed away.","added":"2026-07-13"},
+{"id":"barren-1","word":"barren","pos":"adjective","meaning":"having a dry and bare landscape that is unable to support life","example":"The east part of the island was a barren plase untill some settalers planted trees on the land.","added":"2026-07-13"},
+{"id":"intangible-1","word":"intangible","pos":"adjective","meaning":"difficult to define or understand, usually due to not having physical presence","example":"The science project was intangable because we didn't have the actual rock to take notes on.","added":"2026-07-13"},
+{"id":"frugal-1","word":"frugal","pos":"adjective","meaning":"careful not to spend much money or be wasteful in any way","example":"I am very frugal because I never want to spend my money on something that I wouldn't need.","added":"2026-07-13"},
+{"id":"gluttonous-1","word":"gluttonous","pos":"adjective","meaning":"very greedy","example":"My dad would never give my brother money to buy candy because he might get gluttonous.","added":"2026-07-13"},
+{"id":"stagnate-1","word":"stagnate","pos":"verb","meaning":"to stop progressing or changing","example":"His coach always said to keep working hard because if he didn't he would start to stagnate.","added":"2026-07-13"},
+{"id":"stupendous-1","word":"stupendous","pos":"adjective","meaning":"very impressive","example":"The stupendous castle sat on the top of the hill with two guards.","added":"2026-07-13"},
+{"id":"suave-1","word":"suave","pos":"adjective","meaning":"elegant and charming","example":"The man's sauve look got him a lot of attention.","added":"2026-07-13"},
+{"id":"versatile-1","word":"versatile","pos":"adjective","meaning":"having many uses or skills","example":"This robot can do a lot of versatile tasks like washing dishes or doing the laundrey.","added":"2026-07-13"},
+{"id":"vicinity-1","word":"vicinity","pos":"noun","meaning":"the area around a place","example":"A lot of frogs was in the vicinity of the swamp.","added":"2026-07-14"},
+{"id":"wholesome-1","word":"wholesome","pos":"adjective","meaning":"good for wellbeing or health, usually in a physical, emotional or moral way","example":"I like to have a wholesome lunch to sustain my energy for the rest of the day and to grow.","added":"2026-07-14"},
+{"id":"exquisite-1","word":"exquisite","pos":"adjective","meaning":"particularly beautiful or fine","example":"This painting is very exquisite to me because of all the colors.","added":"2026-07-14"},
+{"id":"fabricate-1","word":"fabricate","pos":"verb","meaning":"to make something up or pretend it's true","example":"My friend never frabricates when I talk to him.","added":"2026-07-14"},
+{"id":"wretched-1","word":"wretched","pos":"adjective","meaning":"unfortunate or in a bad situation","example":"This wretched water bottle didn't last a day because it broke when I squeezed it.","added":"2026-07-14"},
+{"id":"alluring-1","word":"alluring","pos":"adjective","meaning":"attractive and enticing","example":"The man in the ocean was alluring to the animals because of how strange a human would go to the deep ocean.","added":"2026-07-16"},
+{"id":"adversary-1","word":"adversary","pos":"noun","meaning":"a rival in a competition, dispute or combat","example":"I knew my adversary was gonna lose this time because of how many hours I had trained.","added":"2026-07-16"},
+{"id":"appease-1","word":"appease","pos":"verb","meaning":"to calm someone, usually by satisfying their demands","example":"I cleaned up for everyone to appease them.","added":"2026-07-16"},
+{"id":"adequate-1","word":"adequate","pos":"adjective","meaning":"enough","example":"300 corn was adequate supply of food for the bear in the winter.","added":"2026-07-16"},
+{"id":"insomnia-1","word":"insomnia","pos":"noun","meaning":"the inability to sleep","example":"I never suffer from insomnia because I sleep late and soon get tired.","added":"2026-07-16"},
+{"id":"scrutinise-1","word":"scrutinise","pos":"verb","meaning":"to carefully or critically examine something","example":"I went back home and scrutinise the letter that I got.","added":"2026-07-17"},
+{"id":"assiduous-1","word":"assiduous","pos":"adjective","meaning":"hard-working","example":"The assiduous basketball player did 20 billion slam dunks.","added":"2026-07-17"},
+{"id":"skirmish-1","word":"skirmish","pos":"noun","meaning":"a short period of fighting or disagreement (as a verb: to fight)","example":"The group for making a town had a skirmish about which idea to use.","added":"2026-07-17"},
+{"id":"solitary-1","word":"solitary","pos":"adjective","meaning":"alone or isolated, by choice or force","example":"I am solitary sometimes in camps because I am tired.","added":"2026-07-17"},
+{"id":"aloof-1","word":"aloof","pos":"adjective","meaning":"having a distant or detached personality","example":"Somtimes I feel very sad when aloof people say unkind things to me.","added":"2026-07-17"},
+{"id":"adhere-1","word":"adhere","pos":"verb","meaning":"to act in accordance with something","example":"All students must adhere to the rules set by the teacher.","added":"2026-07-17"},
+{"id":"adhere-2","word":"adhere","pos":"verb","meaning":"to stick or affix to something","example":"Press the paper to adhere it to the board.","added":"2026-07-17"},
+{"id":"arduous-1","word":"arduous","pos":"adjective","meaning":"difficult, or demanding a lot of effort","example":"The hike was arduous.","added":"2026-07-20"},
+{"id":"affinity-1","word":"affinity","pos":"noun","meaning":"a natural attraction or understanding","example":"I have an affinity with math.","added":"2026-07-20"},
+{"id":"acquaint-1","word":"acquaint","pos":"verb","meaning":"to make yourself, or someone else, familiar with something","example":"I have to acquaint with the new town.","added":"2026-07-20"},
+{"id":"succinct-1","word":"succinct","pos":"adjective","meaning":"short — clearly expressed in a few words","example":"My succinct speach impressed everybody.","added":"2026-07-20"},
+{"id":"reproach-1","word":"reproach","pos":"noun","meaning":"a visual or verbal expression of disapproval","example":"My coach gave him a look of reproach.","added":"2026-07-20"},
+{"id":"catastrophe-1","word":"catastrophe","pos":"noun","meaning":"a sudden event causing destruction and suffering","example":"The catastrophe was very concerning because their was a snow storm.","added":"2026-07-27"},
+{"id":"simultaneous-1","word":"simultaneous","pos":"adjective","meaning":"happening or existing at the same time","example":"There was simultaneous reactions of my friends.","added":"2026-07-27"},
+{"id":"asunder-1","word":"asunder","pos":"adverb","meaning":"into pieces, usually by force","example":"The strong man was split asunder by the skinny bone kid.","added":"2026-07-27"},
+{"id":"brusque-1","word":"brusque","pos":"adjective","meaning":"rudely abrupt in speech or behaviour","example":"Ariana gave a brusque replay to her brother's question.","added":"2026-07-27"},
+{"id":"audacity-1","word":"audacity","pos":"noun","meaning":"disrespectful behavior","example":"He had the audacity to storm out of class.","added":"2026-07-27"},
+{"id":"audacity-2","word":"audacity","pos":"noun","meaning":"a willingness to take daring risks","example":"They were famous because of their audacity.","added":"2026-07-27"},
+{"id":"seldom-1","word":"seldom","pos":"adverb","meaning":"almost never; rarely","example":"I seldom get to go to the apple store.","added":"2026-08-10"},
+{"id":"aptitude-1","word":"aptitude","pos":"noun","meaning":"a natural talent or ability to do something well","example":"Most people have an aptitude for walking.","added":"2026-08-10"},
+{"id":"apprehensive-1","word":"apprehensive","pos":"adjective","meaning":"tense or fearful that something bad might happen","example":"I felt apprehensive about the idea of going to yoyoge.","added":"2026-08-10"},
+{"id":"apt-1","word":"apt","pos":"adjective","meaning":"appropriate in every circumstance","example":"This table is apt.","added":"2026-08-10"},
+{"id":"apt-2","word":"apt","pos":"adjective","meaning":"able to learn or understand things quickly","example":"I am an apt student.","added":"2026-08-10"},
+{"id":"assortment-1","word":"assortment","pos":"noun","meaning":"a group of things or people that are similar but have some recognisable differences","example":"We ate an assorment of chocolate.","added":"2026-08-10"}
+]}</script>
+
+<script src="generate.js"></script>
+<script>
+(function(){
+"use strict";
+var SHEET_ID = '190c37nH4QqdHu7QLtROKx7KDNq_FQhCkDU6jOFRKs54';
+var SHEET_GID = '1376137610';
+var SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit?gid=' + SHEET_GID;
+// Cloud score sync (Supabase). Set to null to fall back to on-device storage only.
+var REMOTE = {
+  url: 'https://ywoaeadxfettakxehsel.supabase.co',
+  key: 'sb_publishable_grIeEoGO_hvTpDm0dI6bsw_OD4tS041',
+  row: 'jax'
+};
+var LS_KEY = 'word-dojo-state-v1';
+var PROFILE = { name:'Jax', age:'8 years old but reading and spelling well above his age',
+                goal:'11-plus vocabulary', band:'upper-elementary' };
+var GEN_CFG = REMOTE ? { url: REMOTE.url, key: REMOTE.key } : null;
+var QCACHE = QGEN.Cache('word-dojo-qcache-v1', 14 * 86400000);
+var DAY = 86400000;
+var INTERVALS = [0, 1, 3, 7, 14];          // days until next review for box 1..5
+var SESSION_SIZE = 10;
+var NEW_PER_DAY = 5;   // brand-new words introduced per calendar day
+
+var state = JSON.parse(document.getElementById('app-state').textContent);
+var dirty = false;
+try {
+  var raw = localStorage.getItem(LS_KEY);
+  if (raw) {
+    var loc = JSON.parse(raw);
+    if (loc && loc.savedAt > state.savedAt) { state = loc; dirty = true; }
+  }
+} catch (e) {}
+// practice data recorded before this moment came from pre-launch testing — drop it everywhere
+var RESET_BEFORE = 1787696911490;
+function scrub(s){
+  s.sessions = (s.sessions || []).filter(function(x){ return x.t >= RESET_BEFORE; });
+  Object.keys(s.stats || {}).forEach(function(id){
+    if ((s.stats[id].last || 0) < RESET_BEFORE) delete s.stats[id];
+  });
+}
+scrub(state);
+if (typeof state.ki !== 'number') state.ki = 0;
+if (typeof state.newCount !== 'number') state.newCount = 0;
+if (typeof state.wishes !== 'number') state.wishes = 0;
+
+function saveLocal(){
+  try { state.savedAt = Date.now(); localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  if (REMOTE) dirty = true;
+}
+
+/* ---------- cloud sync (Supabase REST; active only when REMOTE is set) ---------- */
+function remoteHeaders(){
+  return { apikey: REMOTE.key, Authorization: 'Bearer ' + REMOTE.key, 'Content-Type': 'application/json' };
+}
+async function remoteLoad(){
+  var r = await fetch(REMOTE.url + '/rest/v1/word_lab?id=eq.' + REMOTE.row + '&select=state', { headers: remoteHeaders() });
+  if (!r.ok) throw new Error('remote load failed');
+  var rows = await r.json();
+  return rows.length ? rows[0].state : null;
+}
+async function remoteSave(){
+  var h = remoteHeaders();
+  h.Prefer = 'resolution=merge-duplicates';
+  var r = await fetch(REMOTE.url + '/rest/v1/word_lab', {
+    method: 'POST', headers: h,
+    body: JSON.stringify({ id: REMOTE.row, state: state, updated_at: new Date().toISOString() })
+  });
+  if (!r.ok) throw new Error('remote save failed');
+}
+function mergeRemote(remote){
+  if (!remote) return false;
+  var changed = false;
+  var haveSession = {};
+  state.sessions.forEach(function(s){ haveSession[s.t] = 1; });
+  (remote.sessions || []).forEach(function(s){
+    if (!haveSession[s.t]){ state.sessions.push(s); changed = true; }
+  });
+  state.sessions.sort(function(a, b){ return a.t - b.t; });
+  Object.keys(remote.stats || {}).forEach(function(id){
+    var rs = remote.stats[id], ls = state.stats[id];
+    if (!ls || rs.last > ls.last){ state.stats[id] = rs; changed = true; }
+  });
+  if (typeof remote.ki === 'number' && remote.ki > (state.ki || 0)){ state.ki = remote.ki; changed = true; }
+  if (typeof remote.wishes === 'number' && remote.wishes > (state.wishes || 0)){ state.wishes = remote.wishes; changed = true; }
+  var haveItem = {};
+  state.items.forEach(function(it){ haveItem[it.id] = 1; });
+  (remote.items || []).forEach(function(it){
+    if (!haveItem[it.id]){ state.items.push(it); changed = true; }
+  });
+  return changed;
+}
+async function persist(){
+  saveLocal();
+  if (!REMOTE) return { ok:true, local:true };
+  try { await remoteSave(); dirty = false; return { ok:true }; }
+  catch (e) { return { ok:false }; }
+}
+
+/* ---------- word sync from the Google Sheet ---------- */
+var lastSync = null;
+function normWord(w){
+  var fixes = { frabricate:'fabricate', apease:'appease' };
+  w = String(w).toLowerCase().trim();
+  return fixes[w] || w;
+}
+function normPos(word, pos){
+  if (word === 'asunder') return 'adverb';
+  pos = String(pos || '').toLowerCase().trim();
+  if (pos.indexOf('adverb') === 0) return 'adverb';
+  if (pos.indexOf('adjective') === 0) return 'adjective';
+  if (pos.indexOf('verb') === 0) return 'verb';
+  if (pos.indexOf('noun') === 0) return 'noun';
+  return pos || 'noun';
+}
+function parseSheetDate(s){
+  var m = String(s).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if (!m) return todayIso();
+  var y = m[3].length === 2 ? '20' + m[3] : m[3];
+  return y + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0');
+}
+function todayIso(){
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+async function syncSheet(){
+  try {
+    var r = await fetch('https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&gid=' + SHEET_GID);
+    if (!r.ok) throw new Error('sheet fetch failed');
+    var t = await r.text();
+    var json = JSON.parse(t.substring(t.indexOf('{'), t.lastIndexOf('}') + 1));
+    // columns: Word | Part of speech | Meaning | Synonym | Antonym | Example sentence
+    var rows = json.table.rows.map(function(row){
+      return (row.c || []).slice(0, 6).map(function(c){
+        return c ? String(c.f != null ? c.f : c.v).trim() : '';
+      });
+    });
+    var counts = {}, added = 0, needMeaning = 0;
+    var existing = {};
+    state.items.forEach(function(it){ existing[it.id] = 1; });
+    rows.forEach(function(row){
+      var raw = row[0] || '';
+      if (!raw || raw.toLowerCase() === 'word') return;
+      // A row with no meaning yet cannot be practised; count it so the parent
+      // view can say how many are still waiting to be filled in.
+      if (!row[2]){ needMeaning++; return; }
+      var word = normWord(raw);
+      counts[word] = (counts[word] || 0) + 1;
+      var id = word.replace(/[^a-z]/g, '') + '-' + counts[word];
+      if (existing[id]) return;
+      state.items.push({
+        id: id, word: word, pos: normPos(word, row[1]),
+        meaning: row[2], syn: row[3] || '', ant: row[4] || '',
+        example: row[5] || '', added: todayIso()
+      });
+      existing[id] = 1; added++;
+    });
+    lastSync = { ok:true, added:added, needMeaning:needMeaning, t:Date.now() };
+    if (added){ saveLocal(); if (!session) render(); }
+    else if (view === 'parent') render();
+  } catch (e) {
+    lastSync = { ok:false, t:Date.now() };
+    if (view === 'parent') render();
+  }
+}
+
+/* ---------- stats helpers ---------- */
+var EMPTY_STAT = { box:1, due:0, last:0, seen:0, correct:0, wrong:0 };
+function st0(id){ return state.stats[id] || EMPTY_STAT; }
+function st(id){
+  if (!state.stats[id]) state.stats[id] = { box:1, due:0, last:0, seen:0, correct:0, wrong:0 };
+  return state.stats[id];
+}
+function acc(s){ var n = s.correct + s.wrong; return n ? s.correct / n : null; }
+function dueNow(id){ return st(id).due <= Date.now(); }
+/* Only words Jax has actually met can be "due". The rest are not overdue, they
+   simply have not been introduced yet, and arrive five a day. */
+function dueCounts(){
+  var now = Date.now(), today = 0, tomorrow = 0;
+  var endTomorrow = startOfDay(now) + 2*DAY;
+  state.items.forEach(function(it){
+    var t = st0(it.id);
+    if (t.seen === 0) return;
+    if (t.due <= now) today++;
+    else if (t.due < endTomorrow) tomorrow++;
+  });
+  return { today:today, tomorrow:tomorrow };
+}
+function startOfDay(t){ var d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); }
+
+/* ---------- small utils ---------- */
+function shuffle(a){ a = a.slice(); for (var i=a.length-1; i>0; i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function lev(a, b){
+  var m = a.length, n = b.length, i, j;
+  if (!m) return n; if (!n) return m;
+  var prev = [], cur = [];
+  for (j=0; j<=n; j++) prev[j] = j;
+  for (i=1; i<=m; i++){
+    cur[0] = i;
+    for (j=1; j<=n; j++){
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a.charAt(i-1) === b.charAt(j-1) ? 0 : 1));
+    }
+    var t = prev; prev = cur; cur = t;
+  }
+  return prev[n];
+}
+function letterDiff(a, b){
+  var c = {}, k, d = 0;
+  for (k=0; k<a.length; k++) c[a[k]] = (c[a[k]]||0) + 1;
+  for (k=0; k<b.length; k++) c[b[k]] = (c[b[k]]||0) - 1;
+  for (k in c) d += Math.abs(c[k]);
+  return d;
+}
+function relTime(t){
+  if (!t) return '—';
+  var d = startOfDay(Date.now()) - startOfDay(t);
+  if (d <= 0) return 'today';
+  var days = Math.round(d / DAY);
+  if (days === 1) return 'yesterday';
+  if (days < 30) return days + 'd ago';
+  return new Date(t).toLocaleDateString();
+}
+function dueLabel(t){
+  var now = Date.now();
+  if (t <= now) return 'now';
+  var d = startOfDay(t) - startOfDay(now);
+  var days = Math.round(d / DAY);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'tomorrow';
+  return 'in ' + days + 'd';
+}
+
+/* ---------- word matching (tolerant of small spelling slips) ---------- */
+function tokenMatches(tok, word){
+  var clean = tok.toLowerCase().replace(/[^a-z]/g, '');
+  if (!clean) return false;
+  var w = word.toLowerCase();
+  if (clean === w) return true;
+  var sufs = ['s','es','ed','d','ing','ly','ness'];
+  for (var i=0; i<sufs.length; i++){
+    var s = sufs[i];
+    if (clean === w + s) return true;
+    if (clean.length > s.length && clean.slice(-s.length) === s){
+      var stem = clean.slice(0, -s.length);
+      if (lev(stem, w) <= 2 && letterDiff(stem, w) <= 2 && stem[0] === w[0]) return true;
+    }
+  }
+  if (clean.length >= 5 && clean[0] === w[0] && lev(clean, w) <= 2) return true;
+  return false;
+}
+function findBlank(item){
+  if (!item.example) return null;
+  var toks = item.example.split(/(\s+)/);
+  for (var i=0; i<toks.length; i++){
+    if (tokenMatches(toks[i], item.word)){
+      var before = toks.slice(0, i).join('');
+      var after = toks.slice(i+1).join('');
+      var punct = toks[i].match(/[^A-Za-z]*$/)[0];
+      return { before: before, after: punct + after };
+    }
+  }
+  return null;
+}
+function checkTyped(input, word){
+  var a = input.trim().toLowerCase().replace(/[^a-z]/g,'');
+  var b = word.toLowerCase();
+  if (!a) return { ok:false };
+  if (a === b) return { ok:true, exact:true };
+  var tol = b.length >= 8 ? 2 : 1;
+  if (a.length >= 3 && lev(a, b) <= tol) return { ok:true, exact:false };
+  return { ok:false };
+}
+
+/* ---------- question generation ---------- */
+function enrichOf(item){ return (window.ENRICH || {})[item.id] || null; }
+function makeQuestion(item, entry){
+  // Freshly generated question for this word, when one came back. A repeat of a
+  // missed word falls through to the local generator so it isn't the same twice.
+  if (session && session.gen && session.gen[item.id] && !(entry && (entry.retry || entry.encore))){
+    var g = session.gen[item.id];
+    QCACHE.consume(item.id);   // asked now, so the next review gets a new one
+    return { item:item, type:g.type, prompt:g.prompt, options: shuffle(g.options.slice()),
+             answer:g.answer, teach:g.teach, why:g.why || {}, generated:true };
+  }
+  return makeLocalQuestion(item);
+}
+function makeLocalQuestion(item){
+  var types = ['meaning', 'wordpick'];
+  var blank = findBlank(item);
+  if (blank) types.push('blank');
+  if (item.word.length <= 12 && item.word.indexOf(' ') < 0) types.push('scramble');
+  var en = enrichOf(item);
+  if (en){
+    (en.quiz || []).forEach(function(t){ types.push(t.type, t.type); });   // authored usage questions, double weight
+  }
+  var type = pick(types);
+  var q = { item:item, type:type };
+  if (type === 'syn' || type === 'ant' || type === 'cloze' || type === 'scen'){
+    var authored = en.quiz.filter(function(t){ return t.type === type; })[0];
+    q.prompt = authored.prompt || '';
+    q.options = shuffle(authored.options.slice());
+    q.answer = authored.answer;
+    return q;
+  }
+
+  if (type === 'meaning'){
+    var pool = state.items.filter(function(o){ return o.word !== item.word; });
+    var same = pool.filter(function(o){ return o.pos === item.pos; });
+    var src = same.length >= 3 ? same : pool;
+    var opts = [], used = {};
+    shuffle(src).forEach(function(o){
+      if (opts.length < 3 && !used[o.meaning] && o.meaning !== item.meaning){ used[o.meaning] = 1; opts.push(o.meaning); }
+    });
+    q.options = shuffle(opts.concat([item.meaning]));
+    q.answer = item.meaning;
+  } else if (type === 'wordpick'){
+    var pool2 = state.items.filter(function(o){ return o.word !== item.word; });
+    var same2 = pool2.filter(function(o){ return o.pos === item.pos; });
+    var src2 = same2.length >= 3 ? same2 : pool2;
+    var opts2 = [], used2 = {};
+    shuffle(src2).forEach(function(o){
+      if (opts2.length < 3 && !used2[o.word]){ used2[o.word] = 1; opts2.push(o.word); }
+    });
+    q.options = shuffle(opts2.concat([item.word]));
+    q.answer = item.word;
+  } else if (type === 'blank'){
+    q.blank = blank;
+    q.answer = item.word;
+  } else {
+    var w = item.word.toLowerCase();
+    var letters = shuffle(w.split(''));
+    var guard = 0;
+    while (letters.join('') === w && guard++ < 10) letters = shuffle(w.split(''));
+    q.letters = letters;
+    q.answer = w;
+  }
+  return q;
+}
+
+/* ---------- session ---------- */
+var session = null;
+/* Jax meets five brand-new words a day. The allowance is per calendar day
+   rather than per round, so a second round on the same day is pure review and
+   he is never shown more than five unfamiliar words in a day. */
+function todayKey(){
+  var d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+}
+function newWordsLeftToday(){
+  if (state.newDay !== todayKey()) return NEW_PER_DAY;
+  return Math.max(0, NEW_PER_DAY - (state.newCount || 0));
+}
+function noteNewWordsShown(n){
+  if (!n) return;
+  if (state.newDay !== todayKey()){ state.newDay = todayKey(); state.newCount = 0; }
+  state.newCount = (state.newCount || 0) + n;
+}
+
+function buildQueue(){
+  var now = Date.now();
+  var seenItems = state.items.filter(function(it){ return st0(it.id).seen > 0; });
+  var due = seenItems.filter(function(it){ return st0(it.id).due <= now; });
+  due.sort(function(a, b){
+    var sa = st0(a.id), sb = st0(b.id);
+    return (sa.box - sb.box) || (sa.due - sb.due) || (a.added < b.added ? -1 : 1);
+  });
+  var q = due.slice(0, SESSION_SIZE);
+
+  // introduce today's remaining new words, in sheet order
+  var newbies = [];
+  var allowance = Math.min(newWordsLeftToday(), Math.max(0, SESSION_SIZE - q.length));
+  if (allowance > 0){
+    newbies = state.items.filter(function(it){ return st0(it.id).seen === 0; }).slice(0, allowance);
+  }
+
+  // still short? top up with whatever is closest to being due
+  if (q.length + newbies.length < SESSION_SIZE){
+    var chosen = {};
+    q.concat(newbies).forEach(function(it){ chosen[it.id] = 1; });
+    var rest = seenItems.filter(function(it){ return !chosen[it.id]; })
+      .sort(function(a, b){ return st0(a.id).due - st0(b.id).due; });
+    q = q.concat(rest.slice(0, SESSION_SIZE - q.length - newbies.length));
+  }
+
+  // every new word gets a teaching card before it is ever asked about
+  var entries = shuffle(q).map(function(it){ return { item: it, mode:'quiz', retry:false }; });
+  newbies.forEach(function(it, i){
+    entries.splice(Math.min(i * 2, entries.length), 0, { item: it, mode:'learn' });
+  });
+  newbies.forEach(function(it){ entries.push({ item: it, mode:'quiz', retry:false }); });
+
+  // Early on there is little to review, which would leave a short round. Give
+  // the new words a second pass instead: the generator varies the question type,
+  // so a repeat is a different angle on the same word rather than a rerun.
+  var scored = q.length + newbies.length;
+  if (scored < SESSION_SIZE && newbies.length){
+    var extra = Math.min(SESSION_SIZE - scored, newbies.length * 2);
+    for (var k = 0; k < extra; k++){
+      entries.push({ item: newbies[k % newbies.length], mode:'quiz', retry:false, encore:true });
+      scored++;
+    }
+  }
+  return { entries: entries, total: scored, newCount: newbies.length };
+}
+
+/* A round is prepared (queue built + questions requested) before Jax presses
+   Start, so generation latency is hidden. */
+var prepared = null;
+var awaitingRound = null;
+
+function prepareRound(){
+  var built = buildQueue();
+  if (!built.total) return null;
+  var round = { built: built, questions: {}, state:'pending', why:null };
+  var words = [], seenId = {};
+  built.entries.forEach(function(e){
+    if (e.mode !== 'quiz' || seenId[e.item.id]) return;
+    seenId[e.item.id] = 1;
+    words.push({ item: e.item, history: st0(e.item.id) });
+  });
+  round.promise = QGEN.generateCached(QCACHE, GEN_CFG, words, PROFILE).then(function(r){
+    round.questions = r.questions || {};
+    round.state = r.ok ? 'ready' : 'failed';
+    round.why = r.why;
+    return round;
+  });
+  return round;
+}
+function prefetchRound(){
+  if (prepared || session) return;
+  prepared = prepareRound();
+}
+function startSession(){
+  var round = prepared || prepareRound();
+  prepared = null;
+  if (!round) return;
+  if (round.state === 'pending'){
+    awaitingRound = round;
+    render();
+    round.promise.then(function(){
+      if (awaitingRound === round){ awaitingRound = null; launchRound(round); }
+    });
+    return;
+  }
+  launchRound(round);
+}
+function launchRound(round){
+  session = {
+    queue: round.built.entries,
+    idx: 0, total: round.built.total, firstTry: {}, streak: 0, bestStreak: 0,
+    types: {}, missed: {}, scored: [], done: false,
+    gen: round.questions || {}, genState: round.state
+  };
+  noteNewWordsShown(round.built.newCount);   // spend today's new-word allowance
+  saveLocal();
+  nextQuestion();
+}
+function nextQuestion(){
+  if (session.idx >= session.queue.length){ endSession(); return; }
+  var entry = session.queue[session.idx];
+  if (entry.mode === 'learn'){ session.q = null; session.answered = false; render(); return; }
+  session.q = makeQuestion(entry.item, entry);
+  session.answered = false;
+  session.chosen = -1;
+  render();
+}
+function answer(correct, detail){
+  if (session.answered) return;
+  session.answered = true;
+  var entry = session.queue[session.idx];
+  var item = entry.item;
+  var s = st(item.id);
+  if (!entry.retry){
+    session.firstTry[item.id] = correct;
+    session.scored.push(correct);
+    var tk = session.q.type;
+    if (!session.types[tk]) session.types[tk] = [0, 0];
+    session.types[tk][1]++;
+    if (correct) session.types[tk][0]++;
+    s.seen++; s.last = Date.now();
+    if (correct){
+      s.correct++;
+      s.box = Math.min(5, s.box + 1);
+      s.due = startOfDay(Date.now()) + INTERVALS[s.box - 1] * DAY + 8*3600000;
+      if (s.due <= Date.now()) s.due = Date.now() + DAY;
+    } else {
+      s.wrong++;
+      s.box = 1;
+      s.due = Date.now();
+      session.missed[item.id] = 1;
+      session.queue.push({ item:item, mode:'quiz', retry:true });
+    }
+    saveLocal();
+  }
+  if (correct){ session.streak++; session.bestStreak = Math.max(session.bestStreak, session.streak); }
+  else session.streak = 0;
+  session.feedback = { correct: correct, detail: detail || '' };
+  render();
+}
+function endSession(){
+  var correct = session.scored.filter(Boolean).length;
+  state.sessions.push({
+    t: Date.now(), correct: correct, total: session.total,
+    types: session.types, missed: Object.keys(session.missed)
+  });
+  saveLocal();
+  session.done = true;
+  session.score = { correct: correct, total: session.total };
+  session.earned = correct;
+  session.clip = pickClip(session.total ? correct / session.total : 0);
+  state.ki = (state.ki || 0) + correct;
+  saveLocal();
+  render();
+  setTimeout(function(){ if (!prepared) prepared = prepareRound(); }, 1500);
+  if (REMOTE) persist().then(function(r){
+    var n = document.getElementById('save-note');
+    if (n) n.textContent = r.ok ? 'Score synced.' : 'Couldn’t sync right now — the score is saved on this device and will sync later.';
+  });
+  if (session.total && correct / session.total >= 0.9) confetti();
+}
+
+
+/* ---------- power-up scene + dragon ball hunt ---------- */
+var summoning = false;
+function summonView(){
+  return '<div class="card center home-hero">' +
+    '<div class="qask">The sky goes dark&hellip;</div>' +
+    '<div class="dragon-stage">' + clipMarkup(DRAGON_CLIP, 'dragon-gif', dragonSvg()) + '</div>' +
+    '<h1 style="margin:6px 0 4px; font-size:1.7rem;">Your wish is granted!</h1>' +
+    '<p class="muted" style="margin:0 0 18px;">Seven Dragon Balls gathered from ' + (KI_PER_BALL * BALLS) + ' ki of practice.</p>' +
+    '<button class="btn primary" data-act="wish-done">Awesome</button>' +
+    '</div>';
+}
+
+var KI_PER_BALL = 20, BALLS = 7;
+
+function tierFor(pct){
+  if (pct >= 0.999) return 'ssj';
+  if (pct >= 0.7)   return 'strong';
+  if (pct >= 0.4)   return 'steady';
+  return 'calm';
+}
+var TIER_COLOR = {
+  ssj:    { aura:'#FFD23F', aura2:'#FFA61A', hair:'#FFD23F', glow:'rgba(255,210,63,.55)' },
+  strong: { aura:'#7EC8FF', aura2:'#3E8BFF', hair:'#2f3646', glow:'rgba(62,139,255,.45)' },
+  steady: { aura:'#9FD8FF', aura2:'#68A8E8', hair:'#2f3646', glow:'rgba(104,168,232,.35)' },
+  calm:   { aura:'#C3D3E4', aura2:'#93A9C0', hair:'#2f3646', glow:'rgba(147,169,192,.3)' }
+};
+
+/* Celebration clips, embedded from GIPHY's CDN. One is picked at random when a
+   round ends; the previous pick is skipped so the same clip never repeats twice
+   in a row. If a clip cannot be loaded, the drawn fighter takes its place. */
+// winOnly clips read as gloating, so they are held back on a weak round -- a
+// "Tough round" message under a smug thumbs-up undercuts itself. Power-up clips
+// suit any score, since powering up to try again is the right note either way.
+var PW_CLIPS = [
+  { id:'UBB6f0hKhlShy',      alt:'Powering up' },
+  { id:'hxCB1Qf11SrU4',      alt:'Charging up' },
+  { id:'eUIb94IVB7pIBRoF0A', alt:'Unleashing energy' },
+  { id:'11YMhfLfGoq5Gg',     alt:'Thumbs up',      winOnly:true },
+  { id:'125cxELHOpsLra',     alt:'Like a boss',    winOnly:true },
+  { id:'RihThkWxzFENW',      alt:'Celebrating',    winOnly:true }
+];
+var DRAGON_CLIP = { id:'mD78vEbuQRibX0VJrH', alt:'The dragon appears' };
+var LAST_CLIP_KEY = 'word-dojo-lastclip';
+
+function clipUrl(id, ext){ return 'https://media.giphy.com/media/' + id + '/giphy.' + ext; }
+
+function pickClip(pct){
+  var pool = PW_CLIPS.filter(function(c){ return pct >= 0.7 || !c.winOnly; });
+  var lastId = null;
+  try { lastId = localStorage.getItem(LAST_CLIP_KEY); } catch (e) {}
+  var fresh = pool.filter(function(c){ return c.id !== lastId; });
+  if (fresh.length) pool = fresh;                       // never the same clip twice running
+  var clip = pool[Math.floor(Math.random() * pool.length)];
+  try { localStorage.setItem(LAST_CLIP_KEY, clip.id); } catch (e) {}
+  return clip;
+}
+
+// picture + hidden fallback; watchClips() swaps them if the clip fails to load
+function clipMarkup(clip, imgClass, fallbackHtml){
+  return '<div class="clip-wrap">' +
+    '<picture>' +
+      '<source srcset="' + clipUrl(clip.id, 'webp') + '" type="image/webp">' +
+      '<img class="clip-img ' + imgClass + '" src="' + clipUrl(clip.id, 'gif') + '" ' +
+        'alt="' + clip.alt + '" decoding="async">' +
+    '</picture>' +
+    '<div class="clip-fallback" style="display:none;">' + fallbackHtml + '</div>' +
+    '</div>';
+}
+
+function powerScene(tier, clip){
+  return '<div class="pw-scene" id="pw-scene">' +
+    clipMarkup(clip || PW_CLIPS[0], 'pw-gif', fighterSvg(tier)) +
+    '</div>';
+}
+
+function watchClips(){
+  var imgs = document.querySelectorAll('.clip-img');
+  for (var k = 0; k < imgs.length; k++){
+    (function(img){
+      if (img.dataset.watched) return;
+      img.dataset.watched = '1';
+      function fail(){
+        var wrap = img.closest('.clip-wrap');
+        if (!wrap) return;
+        var pic = wrap.querySelector('picture');
+        var fb = wrap.querySelector('.clip-fallback');
+        if (pic) pic.style.display = 'none';
+        if (fb) fb.style.display = 'block';
+      }
+      img.addEventListener('error', fail);
+      if (img.complete && img.naturalWidth === 0) fail();
+    })(imgs[k]);
+  }
+}
+
+function fighterSvg(tier){
+  var c = TIER_COLOR[tier];
+  var ssj = tier === 'ssj';
+  // Hair sits behind the head with its valleys BELOW the top of the skull, so
+  // the spikes rise out of a connected mass instead of floating apart.
+  // A full mass of hair surrounding the head - wider than the skull and reaching
+  // below the ears - so the spikes read as hair volume, not a crown on top.
+  var hair = ssj
+    ? '<path d="M66 90 C60 60 64 32 74 14 L81 48 L89 6 L96 44 L104 2 L111 42 L121 8 L127 46 C137 30 140 62 134 90 Z" fill="' + c.hair + '"/>'
+    : '<path d="M68 90 C63 62 67 38 76 22 L83 52 L90 18 L97 48 L104 14 L111 46 L120 20 L126 50 C135 38 138 64 132 90 Z" fill="' + c.hair + '"/>';
+  var skin = '#f2cfa8', gi = '#ea7c2a', giDark = '#c9611b';
+
+  return '<svg class="pw-fighter" viewBox="0 0 200 244" role="img" aria-label="A fighter powering up">' +
+    '<defs>' +
+      '<radialGradient id="pwAura" cx="50%" cy="58%" r="55%">' +
+        '<stop offset="0%" stop-color="' + c.aura + '" stop-opacity=".75"/>' +
+        '<stop offset="50%" stop-color="' + c.aura2 + '" stop-opacity=".28"/>' +
+        '<stop offset="100%" stop-color="' + c.aura2 + '" stop-opacity="0"/>' +
+      '</radialGradient>' +
+      '<linearGradient id="pwCol" x1="0" y1="1" x2="0" y2="0">' +
+        '<stop offset="0%" stop-color="' + c.aura + '" stop-opacity=".5"/>' +
+        '<stop offset="100%" stop-color="' + c.aura + '" stop-opacity="0"/>' +
+      '</linearGradient>' +
+    '</defs>' +
+    '<ellipse cx="100" cy="140" rx="86" ry="102" fill="url(#pwAura)"/>' +
+    '<path d="M58 236 C64 152 76 96 100 36 C124 96 136 152 142 236 Z" fill="url(#pwCol)"/>' +
+    hair +
+    '<circle cx="100" cy="62" r="19" fill="' + skin + '"/>' +
+    '<circle cx="93" cy="59" r="2.8" fill="#2b3040"/><circle cx="107" cy="59" r="2.8" fill="#2b3040"/>' +
+    '<path d="M94 72 q6 5 12 0" stroke="#8a5240" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+    // limbs as thick round strokes so they read as solid at small sizes
+    '<path d="M82 100 C66 110 56 126 55 142" stroke="' + gi + '" stroke-width="19" fill="none" stroke-linecap="round"/>' +
+    '<path d="M118 100 C134 110 144 126 145 142" stroke="' + gi + '" stroke-width="19" fill="none" stroke-linecap="round"/>' +
+    // torso over the shoulders
+    '<path d="M100 82 C85 82 76 92 74 108 L72 156 L128 156 L126 108 C124 92 115 82 100 82 Z" fill="' + gi + '"/>' +
+    '<path d="M100 82 L92 156 L108 156 Z" fill="#f4f6f8"/>' +
+    '<path d="M72 156 L128 156 L127 167 L73 167 Z" fill="#2f5fa8"/>' +
+    '<circle cx="55" cy="146" r="12.5" fill="' + skin + '"/><circle cx="145" cy="146" r="12.5" fill="' + skin + '"/>' +
+    // braced legs
+    '<path d="M86 167 C82 190 76 208 72 220" stroke="' + gi + '" stroke-width="21" fill="none" stroke-linecap="round"/>' +
+    '<path d="M114 167 C118 190 124 208 128 220" stroke="' + gi + '" stroke-width="21" fill="none" stroke-linecap="round"/>' +
+    '<path d="M74 172 h52" stroke="' + giDark + '" stroke-width="3" opacity=".35"/>' +
+    '<ellipse cx="70" cy="226" rx="17" ry="7.5" fill="#2f3646"/>' +
+    '<ellipse cx="130" cy="226" rx="17" ry="7.5" fill="#2f3646"/>' +
+    '</svg>';
+}
+
+/* Rising ki motes and lifted debris. Density scales with the score. */
+function auraBurst(host, tier, correct, total){
+  if (!host) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var c = TIER_COLOR[tier];
+  var cv = document.createElement('canvas');
+  host.insertBefore(cv, host.firstChild);
+  var rect = host.getBoundingClientRect();
+  var W = cv.width = Math.max(1, Math.round(rect.width));
+  var H = cv.height = Math.max(1, Math.round(rect.height));
+  var ctx = cv.getContext('2d');
+  var strength = total ? correct / total : 0;
+
+  var motes = [], pebbles = [];
+  var moteCount = 14 + Math.round(strength * 46);
+  for (var i = 0; i < moteCount; i++){
+    motes.push({ x: W/2 + (Math.random()-0.5) * W * 0.42, y: H * (0.55 + Math.random()*0.5),
+                 vy: 1.1 + Math.random() * (1.4 + strength * 2.4), r: 1.6 + Math.random()*2.6,
+                 life: 1, drift: (Math.random()-0.5) * 0.5 });
+  }
+  for (var j = 0; j < 6 + Math.round(strength * 8); j++){
+    pebbles.push({ x: W/2 + (Math.random()-0.5) * W * 0.6, y: H * (0.86 + Math.random()*0.1),
+                   vy: 0.5 + Math.random() * (0.7 + strength), s: 2.5 + Math.random()*3.5,
+                   a: Math.random()*Math.PI, spin:(Math.random()-0.5)*0.16, life: 1 });
+  }
+  var frames = 0;
+  (function tick(){
+    ctx.clearRect(0, 0, W, H);
+    motes.forEach(function(m){
+      m.y -= m.vy; m.x += m.drift; m.life -= 0.010;
+      if (m.life <= 0){ m.y = H * (0.8 + Math.random()*0.2); m.x = W/2 + (Math.random()-0.5)*W*0.42; m.life = 1; }
+      ctx.globalAlpha = Math.max(0, m.life) * 0.85;
+      ctx.fillStyle = c.aura;
+      ctx.beginPath(); ctx.ellipse(m.x, m.y, m.r, m.r * 2.1, 0, 0, Math.PI*2); ctx.fill();
+    });
+    pebbles.forEach(function(p){
+      p.y -= p.vy; p.a += p.spin; p.life -= 0.006;
+      if (p.life <= 0){ p.y = H * 0.92; p.life = 1; }
+      ctx.globalAlpha = Math.max(0, p.life) * 0.7;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
+      ctx.fillStyle = '#8a8f98';
+      ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s * 0.8);
+      ctx.restore();
+    });
+    ctx.globalAlpha = 1;
+    if (++frames < 200) requestAnimationFrame(tick);
+    else cv.remove();
+  })();
+}
+
+function kiIcon(size){
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 20 20" aria-hidden="true" style="vertical-align:-3px;">' +
+    '<circle cx="10" cy="10" r="7" fill="#7EC8FF"/><circle cx="10" cy="10" r="4" fill="#fff" opacity=".85"/></svg>';
+}
+
+/* --- Dragon Balls --- */
+function ballSvg(stars, size){
+  var pts = {
+    1:[[0,0]], 2:[[-4,0],[4,0]], 3:[[0,-5],[-5,3],[5,3]],
+    4:[[-4,-4],[4,-4],[-4,4],[4,4]], 5:[[-5,-5],[5,-5],[0,0],[-5,5],[5,5]],
+    6:[[-5,-5],[5,-5],[-5,0],[5,0],[-5,5],[5,5]],
+    7:[[-5,-6],[5,-6],[-6,0],[0,0],[6,0],[-5,6],[5,6]]
+  }[stars] || [[0,0]];
+  var star = '';
+  pts.forEach(function(pt){
+    star += '<path transform="translate(' + (23 + pt[0]) + ' ' + (23 + pt[1]) + ') scale(.30)" ' +
+      'd="M0 -11 L3 -3.5 L11 -3.5 L4.5 1.5 L7 9.5 L0 4.8 L-7 9.5 L-4.5 1.5 L-11 -3.5 L-3 -3.5 Z" fill="#d8382b"/>';
+  });
+  return '<svg class="db-slot filled" width="' + size + '" height="' + size + '" viewBox="0 0 46 46" ' +
+    'role="img" aria-label="' + stars + '-star dragon ball">' +
+    '<defs><radialGradient id="dbg' + stars + '" cx="36%" cy="30%" r="72%">' +
+      '<stop offset="0%" stop-color="#ffe9a8"/><stop offset="55%" stop-color="#f5b73f"/>' +
+      '<stop offset="100%" stop-color="#d68b16"/></radialGradient></defs>' +
+    '<circle cx="23" cy="23" r="21" fill="url(#dbg' + stars + ')"/>' +
+    '<ellipse cx="15" cy="14" rx="6" ry="4" fill="#fff" opacity=".55"/>' + star + '</svg>';
+}
+
+function dragonSvg(){
+  var BODY = "M18 196 C58 196 72 158 106 146 C144 132 150 96 128 78 C104 58 118 26 154 24 C196 22 212 50 206 76 C200 100 216 116 240 112";
+  return '<svg viewBox="0 0 330 215" width="100%" style="max-width:330px" role="img" aria-label="A great dragon rises and grants a wish">' +
+    '<path d="' + BODY + '" fill="none" stroke="#2a7d51" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path d="' + BODY + '" fill="none" stroke="#4fbe80" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>' +
+    // little dorsal spines along the neck
+    '<g fill="#2a7d51">' +
+      '<path d="M120 62 l10 -13 l3 13 z"/><path d="M150 34 l7 -15 l7 13 z"/><path d="M186 34 l12 -10 l2 14 z"/>' +
+    '</g>' +
+    // head
+    '<path d="M236 96 C258 90 282 96 292 110 C300 122 294 136 278 138 C258 140 240 128 234 114 Z" fill="#4fbe80" stroke="#2a7d51" stroke-width="5" stroke-linejoin="round"/>' +
+    // horns
+    '<path d="M256 98 L250 74 L268 92 Z" fill="#2a7d51"/>' +
+    '<path d="M276 102 L280 78 L290 98 Z" fill="#2a7d51"/>' +
+    // eye + nostril
+    '<circle cx="272" cy="114" r="6" fill="#fff"/><circle cx="273" cy="114" r="3" fill="#d8382b"/>' +
+    '<circle cx="290" cy="122" r="2.4" fill="#2a7d51"/>' +
+    // whiskers streaming back
+    '<path d="M262 132 C240 146 214 146 196 136" stroke="#2a7d51" stroke-width="4.5" fill="none" stroke-linecap="round"/>' +
+    '<path d="M276 138 C258 158 228 162 208 154" stroke="#2a7d51" stroke-width="4.5" fill="none" stroke-linecap="round"/>' +
+    '</svg>';
+}
+
+function dragonBallCard(){
+  var ki = state.ki || 0;
+  var have = Math.min(BALLS, Math.floor(ki / KI_PER_BALL));
+  var ready = have >= BALLS;
+  var slots = '';
+  for (var i = 1; i <= BALLS; i++){
+    slots += i <= have ? ballSvg(i, 46) : '<div class="db-slot empty"></div>';
+  }
+  var toNext = ready ? 0 : (KI_PER_BALL * (have + 1)) - ki;
+  return '<div class="card center' + (ready ? ' db-ready' : '') + '">' +
+    '<h3 style="margin:0 0 2px;">Dragon Ball hunt</h3>' +
+    '<p class="explain" style="margin:0;">' +
+      (ready ? 'All seven! Summon the dragon.' : have + ' of ' + BALLS + ' found &middot; ' + toNext + ' more ki until the next one') +
+    '</p>' +
+    '<div class="db-row">' + slots + '</div>' +
+    (ready ? '<button class="btn accent" data-act="summon">Summon the dragon</button>' : '') +
+    ((state.wishes || 0) ? '<p class="explain" style="margin:8px 0 0;">Wishes granted: ' + state.wishes + '</p>' : '') +
+    '</div>';
+}
+
+/* ---------- confetti ---------- */
+function confetti(){
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cv = document.createElement('canvas');
+  cv.id = 'confetti';
+  cv.width = innerWidth; cv.height = innerHeight;
+  document.body.appendChild(cv);
+  var ctx = cv.getContext('2d');
+  var colors = ['#F5A800', '#0E7C7B', '#DE5033', '#2C9C5A', '#3482D0'];
+  var ps = [];
+  for (var i=0; i<90; i++) ps.push({
+    x: cv.width/2 + (Math.random()-0.5)*200, y: cv.height*0.35,
+    vx: (Math.random()-0.5)*9, vy: -Math.random()*9 - 3,
+    s: 5 + Math.random()*6, c: pick(colors), r: Math.random()*Math.PI
+  });
+  var frames = 0;
+  (function tick(){
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(function(p){
+      p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.r += 0.1;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s); ctx.restore();
+    });
+    if (++frames < 110) requestAnimationFrame(tick);
+    else cv.remove();
+  })();
+}
+
+
+/* ---------- list browsing (search / filter / sort) ---------- */
+var browse = {
+  words:  { q:'', f:'all', sort:'az',   limit:30 },
+  parent: { q:'', f:'all', sort:'weak', limit:30 }
+};
+var PAGE = 30;
+
+// One entry per headword, merging multiple senses.
+function wordEntries(){
+  var groups = {}, order = [];
+  state.items.forEach(function(it){
+    if (!groups[it.word]){ groups[it.word] = []; order.push(it.word); }
+    groups[it.word].push(it);
+  });
+  return order.map(function(w){
+    var its = groups[w];
+    var box = 1, seen = 0, correct = 0, wrong = 0, last = 0, due = Infinity, added = '';
+    its.forEach(function(i){
+      var t = st0(i.id);
+      if (t.box > box) box = t.box;
+      seen += t.seen; correct += t.correct; wrong += t.wrong;
+      if (t.last > last) last = t.last;
+      if (t.due < due) due = t.due;
+      if (i.added > added) added = i.added;
+    });
+    var n = correct + wrong;
+    return { word:w, items:its, box:box, seen:seen, acc: n ? correct/n : null,
+             last:last, due: due === Infinity ? 0 : due, added:added,
+             group: seen === 0 ? 'new' : (box >= 4 ? 'mastered' : 'learning') };
+  });
+}
+
+function matchesQuery(e, q){
+  if (!q) return true;
+  q = q.toLowerCase();
+  if (e.word.toLowerCase().indexOf(q) >= 0) return true;
+  return e.items.some(function(i){ return i.meaning.toLowerCase().indexOf(q) >= 0; });
+}
+
+function applyBrowse(entries, b, groupOf){
+  var found = entries.filter(function(e){ return matchesQuery(e, b.q); });
+  var counts = { all: found.length, new:0, learning:0, mastered:0, needs:0 };
+  found.forEach(function(e){
+    if (counts[e.group] !== undefined) counts[e.group]++;
+    if (e.seen > 0 && (e.box <= 2 || (e.acc !== null && e.acc < 0.6))) counts.needs++;
+  });
+  var list = found.filter(function(e){
+    if (b.f === 'all') return true;
+    if (b.f === 'needs') return e.seen > 0 && (e.box <= 2 || (e.acc !== null && e.acc < 0.6));
+    return e.group === b.f;
+  });
+  var by = {
+    az:   function(a,c){ return a.word < c.word ? -1 : a.word > c.word ? 1 : 0; },
+    weak: function(a,c){ return (a.box - c.box) || ((a.acc===null?1.01:a.acc) - (c.acc===null?1.01:c.acc)) || (a.word < c.word ? -1 : 1); },
+    acc:  function(a,c){ return (a.acc===null?1.01:a.acc) - (c.acc===null?1.01:c.acc) || (a.word < c.word ? -1 : 1); },
+    recent: function(a,c){ return (c.added > a.added ? 1 : c.added < a.added ? -1 : 0) || (a.word < c.word ? -1 : 1); },
+    last: function(a,c){ return (c.last - a.last) || (a.word < c.word ? -1 : 1); },
+    due:  function(a,c){ return (a.due - c.due) || (a.word < c.word ? -1 : 1); }
+  };
+  list = list.slice().sort(by[b.sort] || by.az);
+  return { list:list, counts:counts, total:found.length };
+}
+
+function chipsHtml(key, b, counts, defs){
+  return '<div class="chips">' + defs.map(function(d){
+    var n = counts[d[0]];
+    return '<button class="chipbtn' + (b.f === d[0] ? ' on' : '') + '" data-bf="' + key + ':' + d[0] + '">' +
+      d[1] + '<span class="n">' + n + '</span></button>';
+  }).join('') + '</div>';
+}
+
+function toolbarHtml(key, b, sorts, placeholder){
+  return '<div class="toolbar">' +
+    '<input class="search" type="search" id="q-' + key + '" data-bq="' + key + '" placeholder="' + placeholder + '" value="' + esc(b.q) + '">' +
+    '<select data-bs="' + key + '" aria-label="Sort">' +
+      sorts.map(function(o){
+        return '<option value="' + o[0] + '"' + (b.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+      }).join('') +
+    '</select></div>';
+}
+
+function showMoreHtml(key, shown, total){
+  if (shown >= total) return '';
+  return '<button class="btn small showmore" data-bm="' + key + '">Show ' +
+    Math.min(PAGE, total - shown) + ' more (' + (total - shown) + ' left)</button>';
+}
+
+
+function parentWordsCard(){
+  var b = browse.parent;
+  var sorts = [['weak','Weakest first'],['az','A to Z'],['acc','Lowest accuracy'],['due','Due soonest'],['last','Recently practiced']];
+  return '<div class="card"><h3 style="margin:0;">Every word</h3>' +
+    toolbarHtml('parent', b, sorts, 'Search a word or meaning') +
+    '<div id="dyn-parent">' + parentWordsDyn() + '</div></div>';
+}
+
+function parentWordsDyn(){
+  var b = browse.parent;
+  var r = applyBrowse(wordEntries(), b);
+  var shown = r.list.slice(0, b.limit);
+  function accPill(a){
+    if (a === null) return '<span class="muted">&mdash;</span>';
+    var p = Math.round(a * 100);
+    return '<span class="acc-pill ' + (p >= 80 ? 'acc-hi' : p >= 60 ? 'acc-mid' : 'acc-lo') + '">' + p + '%</span>';
+  }
+  var rows = shown.map(function(e){
+    var dots = '';
+    for (var i=1; i<=5; i++) dots += '<span class="' + (i <= e.box ? 'on' : 'offd') + '">&#9679;</span>';
+    var m = e.items[0].meaning;
+    return '<tr><td><b>' + esc(e.word) + '</b>' +
+      (e.items.length > 1 ? ' <span class="muted" style="font-size:.75rem;">' + e.items.length + ' meanings</span>' : '') +
+      '<div class="explain" style="font-size:.78rem;">' + esc(m.slice(0, 46)) + (m.length > 46 ? '…' : '') + '</div></td>' +
+      '<td><span class="dots">' + dots + '</span></td>' +
+      '<td>' + accPill(e.acc) + '</td>' +
+      '<td>' + e.seen + '</td>' +
+      '<td>' + relTime(e.last) + '</td>' +
+      '<td>' + (e.seen ? dueLabel(e.due) : '<span class="muted">&mdash;</span>') + '</td></tr>';
+  }).join('');
+
+  return chipsHtml('parent', b, r.counts,
+      [['all','All'],['needs','Needs work'],['learning','Learning'],['mastered','Mastered'],['new','Not started']]) +
+    '<div class="resultcount">Showing ' + shown.length + ' of ' + r.list.length + ' words</div>' +
+    (shown.length
+      ? '<div class="tblwrap' + (shown.length > 12 ? ' tall' : '') + '"><table class="wordtbl"><thead><tr>' +
+        '<th>Word</th><th>Level</th><th>Accuracy</th><th>Seen</th><th>Last</th><th>Next due</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+      : '<div class="emptylist">No words match this filter.</div>') +
+    showMoreHtml('parent', shown.length, r.list.length);
+}
+
+/* ---------- rendering ---------- */
+var root = document.getElementById('root');
+var view = 'home';
+var saveMsg = '';
+
+function posChip(pos){
+  var cls = /verb/.test(pos) ? 'pos-verb' : /adverb/.test(pos) ? 'pos-adverb' : /adjective/.test(pos) ? 'pos-adjective' : 'pos-noun';
+  if (/adverb/.test(pos)) cls = 'pos-adverb';
+  return '<span class="chip ' + cls + '">' + esc(pos) + '</span>';
+}
+function header(){
+  return '<header class="app"><div class="logo"><span class="mark">J</span> Word Dojo</div></header>' +
+    '<nav class="tabs" role="tablist">' +
+    ['home:Practice', 'words:My words', 'parent:Parent'].map(function(t){
+      var k = t.split(':');
+      return '<button role="tab" data-view="' + k[0] + '" class="' + (view === k[0] ? 'on' : '') + '">' + k[1] + '</button>';
+    }).join('') + '</nav>';
+}
+function saveBanner(){
+  if (!REMOTE || !dirty) return '';
+  return '<div class="savebanner"><span>New progress isn’t synced to the cloud yet.</span>' +
+    '<button class="btn" data-act="save-now">Sync now</button></div>';
+}
+
+function homeView(){
+  var d = dueCounts();
+  var mastered = state.items.filter(function(it){ var t = st0(it.id); return t.seen > 0 && t.box >= 4; }).length;
+  var practiced = state.sessions.length;
+  var fresh = newWordsLeftToday();
+  var unseen = state.items.filter(function(it){ return st0(it.id).seen === 0; }).length;
+  var newToday = Math.min(fresh, unseen);
+  var btnLabel = (d.today || newToday) ? 'Start training' : 'Extra practice';
+  var sub;
+  if (newToday && d.today) sub = newToday + ' new ' + (newToday === 1 ? 'word' : 'words') + ' today, plus ' + d.today + ' to review';
+  else if (newToday)       sub = newToday + ' new ' + (newToday === 1 ? 'word' : 'words') + ' waiting for you today';
+  else if (d.today)        sub = d.today + (d.today === 1 ? ' word is' : ' words are') + ' ready for review';
+  else                     sub = 'All done for today! ' + (d.tomorrow ? d.tomorrow + ' due tomorrow.' : 'Come back tomorrow for five new words.');
+  return saveBanner() +
+    '<div class="card home-hero center">' +
+    '<div class="qask">Hi Jax</div>' +
+    '<h1 style="margin:6px 0 4px; font-size:1.9rem;">Ready to train?</h1>' +
+    '<p class="muted" style="margin:0 0 20px;">' + esc(sub) + '</p>' +
+    '<button class="btn primary" data-act="start">' + btnLabel + ' &nbsp;&rarr;</button>' +
+    '</div>' +
+    '<div class="tilerow">' +
+    '<div class="tile"><div class="v">' + newToday + '<span class="muted" style="font-size:1rem;">/' + NEW_PER_DAY + '</span></div><div class="l">new words today</div></div>' +
+    '<div class="tile"><div class="v">' + d.today + '</div><div class="l">due now</div></div>' +
+    '<div class="tile"><div class="v">' + mastered + '</div><div class="l">mastered words</div></div>' +
+    '<div class="tile"><div class="v">' + state.items.filter(function(it){ return st0(it.id).seen > 0; }).length +
+      '<span class="muted" style="font-size:1rem;">/' + state.items.length + '</span></div><div class="l">words learned</div></div>' +
+    '<div class="tile"><div class="v">' + practiced + '</div><div class="l">practice rounds</div></div>' +
+    '</div>' +
+    dragonBallCard() +
+    '<p class="explain center">Words you miss come back sooner. Words you know move up levels and rest longer &mdash; level 5 words only visit every two weeks.</p>';
+}
+
+/* After a wrong multiple-choice answer, say why the option he actually picked
+   was wrong — not just why the right one was right. */
+function wrongPickNote(q){
+  if (!q.why || session.chosen == null || session.chosen < 0) return '';
+  var picked = q.options[session.chosen];
+  var why = picked && q.why[picked];
+  if (!why) return '';
+  return '<div class="note">You picked <b>' + esc(picked) + '</b> &mdash; ' + esc(why) + '</div>';
+}
+
+
+/* A brand-new word is taught before it is ever tested: the word, what it means,
+   a synonym and antonym when the sheet supplies them, and a sentence. */
+function learnView(){
+  var item = session.queue[session.idx].item;
+  var head = '<div class="progress"><span class="muted" style="font-variant-numeric:tabular-nums;">' +
+    (session.idx + 1) + ' / ' + session.queue.length + '</span>' +
+    '<div class="pbar"><div style="width:' + Math.round(100 * session.idx / session.queue.length) + '%"></div></div></div>';
+  return head + '<div class="card">' +
+    '<div class="newbadge">&#10024; New word</div>' +
+    '<div class="learncard">' +
+      '<div class="qword">' + esc(item.word) + '</div>' + posChip(item.pos) +
+      '<p class="sentence" style="margin:14px 0 6px;"><b>' + esc(item.meaning) + '</b></p>' +
+      (item.example ? '<p class="sentence muted" style="margin:0;">&ldquo;' + esc(item.example) + '&rdquo;</p>' : '') +
+      (item.syn ? '<p class="explain" style="margin:10px 0 0;"><b>Similar:</b> ' + esc(item.syn) + '</p>' : '') +
+      (item.ant ? '<p class="explain" style="margin:2px 0 0;"><b>Opposite:</b> ' + esc(item.ant) + '</p>' : '') +
+    '</div>' +
+    '<div class="center" style="margin-top:20px;">' +
+      '<button class="btn primary" data-act="next">Got it &rarr;</button></div>' +
+    '</div>' +
+    '<div class="center"><button class="btn" data-act="quit" style="font-size:.9rem;padding:8px 16px;">Quit practice</button></div>';
+}
+
+function quizView(){
+  var q = session.q, item = q.item;
+  var head = '<div class="progress"><span class="muted" style="font-variant-numeric:tabular-nums;">' +
+    (session.idx + 1) + ' / ' + session.queue.length + '</span>' +
+    '<div class="pbar"><div style="width:' + Math.round(100 * session.idx / session.queue.length) + '%"></div></div>' +
+    (session.streak >= 2 ? '<span class="streak">&#128293; ' + session.streak + '</span>' : '') + '</div>';
+
+  var body = '';
+  var retry = session.queue[session.idx].retry ? '<div class="qask" style="color:var(--accent-deep)">One more try!</div>' : '';
+  function optBtn(o, i, extraStyle){
+    var cls = 'opt', dis = '';
+    if (session.answered){
+      dis = ' disabled';
+      if (o === q.answer) cls += ' right';
+      else if (i === session.chosen) cls += ' wrong';
+    }
+    return '<button class="' + cls + '" data-opt="' + i + '"' + dis + (extraStyle ? ' style="' + extraStyle + '"' : '') + '>' + esc(o) + '</button>';
+  }
+  if (q.type === 'meaning'){
+    body = retry + '<div class="qask">What does it mean?</div><div class="qword">' + esc(item.word) + '</div>' + posChip(item.pos) +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i); }).join('') + '</div>';
+  } else if (q.type === 'wordpick'){
+    body = retry + '<div class="qask">Which word means&hellip;</div>' +
+      '<p class="sentence" style="font-weight:700;">&ldquo;' + esc(item.meaning) + '&rdquo;</p>' + posChip(item.pos) +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i, 'font-family:Fredoka,sans-serif;font-size:1.1rem;'); }).join('') + '</div>';
+  } else if (q.type === 'syn' || q.type === 'ant'){
+    body = retry + '<div class="qask">' + (q.type === 'syn' ? 'Synonym hunt' : 'Opposite hunt') + '</div>' +
+      '<p class="sentence">Which word means ' + (q.type === 'syn' ? 'almost the <b>same</b> as' : 'the <b>opposite</b> of') + '&hellip;</p>' +
+      '<div class="qword">' + esc(item.word) + '</div>' + posChip(item.pos) +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i, 'font-family:Fredoka,sans-serif;font-size:1.05rem;'); }).join('') + '</div>';
+  } else if (q.type === 'cloze'){
+    body = retry + '<div class="qask">Which word fits?</div>' +
+      '<p class="sentence">' + esc(q.prompt).replace(/___+/g, '<span class="blank">&nbsp;?&nbsp;</span>') + '</p>' +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i, 'font-family:Fredoka,sans-serif;font-size:1.05rem;'); }).join('') + '</div>';
+  } else if (q.type === 'scen'){
+    body = retry + '<div class="qask">Spot it in real life</div>' +
+      '<p class="sentence" style="font-weight:700;">' + esc(q.prompt) + '</p>' +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i); }).join('') + '</div>';
+  } else if (q.type === 'analogy'){
+    body = retry + '<div class="qask">Analogy</div>' +
+      '<p class="sentence" style="font-weight:700;">' +
+        esc(q.prompt).replace(/___+/g, '<span class="blank">&nbsp;?&nbsp;</span>') + '</p>' +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i, 'font-family:Fredoka,sans-serif;font-size:1.05rem;'); }).join('') + '</div>';
+  } else if (q.type === 'oddone'){
+    body = retry + '<div class="qask">Odd one out</div>' +
+      '<p class="sentence" style="font-weight:700;">' + esc(q.prompt) + '</p>' +
+      '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i, 'font-family:Fredoka,sans-serif;font-size:1.05rem;'); }).join('') + '</div>';
+  } else if (q.type === 'blank'){
+    body = retry + '<div class="qask">Finish your sentence</div>' +
+      '<p class="sentence">' + esc(q.blank.before) + ' <span class="blank">&nbsp;?&nbsp;</span>' + esc(q.blank.after) + '</p>' +
+      '<p class="explain">Hint: ' + esc(item.meaning) + '</p>' +
+      '<div class="typebox"><input id="typed" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type the word">' +
+      '<button class="btn primary" data-act="submit-typed">Check</button></div>';
+  } else {
+    body = retry + '<div class="qask">Unscramble the word</div>' +
+      '<p class="explain" style="margin:8px 0 0;">' + posChip(item.pos) + ' &nbsp;' + esc(item.meaning) + '</p>' +
+      '<div class="slots" id="slots"></div>' +
+      '<div class="tiles" id="tiles"></div>' +
+      '<div style="margin-top:14px;"><button class="btn" data-act="scr-undo">&larr; Undo</button></div>';
+  }
+
+  var fb = '';
+  if (session.feedback && session.answered){
+    var f = session.feedback;
+    fb = '<div class="fb ' + (f.correct ? 'good' : 'bad') + '">' +
+      (f.correct ? pick(['Nice one!', 'You got it!', 'Correct!', 'Boom!']) : 'Not quite &mdash; the answer is “' + esc(q.answer) + '”') +
+      (f.detail ? '<div class="note">' + f.detail + '</div>' : '') +
+      (!f.correct ? wrongPickNote(q) : '') +
+      (!f.correct && q.type !== 'meaning' && q.type !== 'blank' && q.type !== 'scramble'
+        ? '<div class="note">Remember: <b>' + esc(item.word) + '</b> means ' + esc(item.meaning) +
+          (q.teach ? '<br>' + esc(q.teach)
+            : (enrichOf(item) && enrichOf(item).tip ? '<br>' + esc(enrichOf(item).tip) : '')) + '</div>' : '') +
+      (!f.correct && !session.queue[session.idx].retry ? '<div class="note">You’ll see this one again before the end.</div>' : '') +
+      '</div><div class="center" style="margin-top:16px;"><button class="btn primary" data-act="next">' +
+      (session.idx + 1 >= session.queue.length ? 'Finish' : 'Next') + ' &rarr;</button></div>';
+  }
+  return head + '<div class="card">' + body + fb + '</div>' +
+    '<div class="center"><button class="btn" data-act="quit" style="font-size:.9rem;padding:8px 16px;">Quit practice</button></div>';
+}
+
+function endView(){
+  var sc = session.score;
+  var pct = sc.total ? sc.correct / sc.total : 0;
+  var stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  var tier = tierFor(pct);
+  var starHtml =
+    powerScene(tier, session.clip) +
+    '<div class="stars">' +
+    [0,1,2].map(function(i){ return '<span class="' + (i < stars ? '' : 'off') + '">&#9733;</span>'; }).join('') + '</div>' +
+    (session.earned ? '<div class="ki-earned">' + kiIcon(15) + '+' + session.earned + ' ki</div>' : '');
+  var missedIds = Object.keys(session.missed);
+  var missedHtml = '';
+  if (missedIds.length){
+    missedHtml = '<div class="card"><h3 style="margin:0 0 4px;">Words to watch</h3><ul class="tricky">' +
+      missedIds.map(function(id){
+        var it = state.items.filter(function(x){ return x.id === id; })[0];
+        return it ? '<li><b>' + esc(it.word) + '</b> &mdash; ' + esc(it.meaning) + '</li>' : '';
+      }).join('') + '</ul></div>';
+  }
+  var praise = pct >= 0.9 ? 'Amazing round!' : pct >= 0.7 ? 'Great work!' : pct >= 0.5 ? 'Good practice!' : 'Tough round — those words will come back soon!';
+  return '<div class="card center home-hero pw-' + tier + '">' + starHtml +
+    '<h1 style="margin:8px 0 4px;">' + praise + '</h1>' +
+    '<div class="big-num">' + sc.correct + '<span class="muted" style="font-size:1.4rem;"> / ' + sc.total + '</span></div>' +
+    (session.bestStreak >= 3 ? '<p class="streak" style="margin:8px 0 0;">&#128293; Best streak: ' + session.bestStreak + '</p>' : '') +
+    '<div style="margin-top:22px;"><button class="btn primary" data-act="finish" id="finish-save">Done</button></div>' +
+    '<p class="explain" id="save-note" style="margin-bottom:0;">' +
+    (REMOTE ? (dirty ? 'Syncing your score…' : 'Score synced.') : 'Score saved on this device.') + '</p>' +
+    '</div>' + missedHtml;
+}
+
+function wordsView(){
+  var b = browse.words;
+  var sorts = [['az','A to Z'],['weak','Needs practice first'],['recent','Recently added'],['last','Recently practiced']];
+  return saveBanner() +
+    '<div class="card"><h2 style="margin:0;">Word collection <span class="muted" style="font-size:1rem;">(' +
+      wordEntries().length + ')</span></h2>' +
+    toolbarHtml('words', b, sorts, 'Search a word or meaning') +
+    '<div id="dyn-words">' + wordsDyn() + '</div></div>';
+}
+
+function wordsDyn(){
+  var b = browse.words;
+  var r = applyBrowse(wordEntries(), b);
+  var shown = r.list.slice(0, b.limit);
+  var body = shown.length ? shown.map(function(e){
+    var dots = '';
+    for (var i=1; i<=5; i++) dots += '<span class="' + (i <= e.box ? 'on' : 'offd') + '">&#9679;</span>';
+    return '<div class="wordrow"><div><b style="font-family:Fredoka,sans-serif;">' + esc(e.word) + '</b> ' +
+      posChip(e.items[0].pos) +
+      (e.seen === 0 ? ' <span class="chip" style="background:var(--surface2);">not practiced yet</span>' : '') +
+      e.items.map(function(i){ return '<div class="explain">' + esc(i.meaning) + '</div>'; }).join('') +
+      '</div><div class="dots">' + dots + '</div></div>';
+  }).join('') : '<div class="emptylist">No words match “' + esc(b.q) + '”.</div>';
+
+  return chipsHtml('words', b, r.counts,
+      [['all','All'],['needs','Needs practice'],['learning','Learning'],['mastered','Mastered'],['new','Not started']]) +
+    '<div class="resultcount">Showing ' + Math.min(shown.length, r.list.length) + ' of ' + r.list.length + ' words</div>' +
+    body + showMoreHtml('words', shown.length, r.list.length);
+}
+
+function parentView(){
+  var d = dueCounts();
+  var rows = state.items.map(function(it){
+    var s = st(it.id);
+    return { it:it, s:s, a:acc(s) };
+  });
+  var struggling = rows.filter(function(r){ return r.s.seen >= 2 && (r.a !== null && r.a < 0.6); });
+  var mastered = rows.filter(function(r){ return r.s.box >= 4; });
+  var sorted = rows.slice().sort(function(x, y){
+    var ax = x.a === null ? 1.01 : x.a, ay = y.a === null ? 1.01 : y.a;
+    return (x.s.box - y.s.box) || (ax - ay) || (x.it.word < y.it.word ? -1 : 1);
+  });
+  function accPill(a){
+    if (a === null) return '<span class="muted">—</span>';
+    var p = Math.round(a * 100);
+    var cls = p >= 80 ? 'acc-hi' : p >= 60 ? 'acc-mid' : 'acc-lo';
+    return '<span class="acc-pill ' + cls + '">' + p + '%</span>';
+  }
+  var focus = sorted.filter(function(r){ return r.s.seen > 0 && (r.a === null || r.a < 0.8 || r.s.box <= 2); }).slice(0, 5);
+  var typeNames = { meaning:'Pick the meaning', wordpick:'Pick the word', blank:'Fill in the sentence', scramble:'Unscramble',
+    syn:'Synonyms', ant:'Antonyms', cloze:'New-sentence fit', scen:'Real-life usage',
+    analogy:'Analogies', oddone:'Odd one out' };
+  var typeAgg = {};
+  state.sessions.forEach(function(ss){
+    Object.keys(ss.types || {}).forEach(function(k){
+      if (!typeAgg[k]) typeAgg[k] = [0, 0];
+      typeAgg[k][0] += ss.types[k][0]; typeAgg[k][1] += ss.types[k][1];
+    });
+  });
+  var typeHtml = Object.keys(typeAgg).length ?
+    '<div class="card"><h3 style="margin:0 0 10px;">Accuracy by question type</h3>' +
+    Object.keys(typeAgg).map(function(k){
+      var t = typeAgg[k]; var p = t[1] ? Math.round(100 * t[0] / t[1]) : 0;
+      return '<div style="display:flex;align-items:center;gap:10px;margin:7px 0;">' +
+        '<span style="width:170px;font-size:.88rem;">' + (typeNames[k] || k) + '</span>' +
+        '<div class="pbar" style="flex:1;"><div style="width:' + p + '%"></div></div>' +
+        '<span style="width:88px;text-align:right;font-variant-numeric:tabular-nums;font-size:.88rem;">' + p + '% <span class="muted">(' + t[1] + ')</span></span></div>';
+    }).join('') + '</div>' : '';
+
+  var sessionsHtml = state.sessions.length ?
+    '<div class="card"><h3 style="margin:0 0 8px;">Practice history</h3>' +
+    state.sessions.slice().reverse().slice(0, 15).map(function(ss){
+      var p = ss.total ? Math.round(100 * ss.correct / ss.total) : 0;
+      return '<div class="wordrow"><span>' + new Date(ss.t).toLocaleDateString(undefined, { month:'short', day:'numeric' }) +
+        ' <span class="muted">' + new Date(ss.t).toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' }) + '</span></span>' +
+        '<span>' + ss.correct + '/' + ss.total + ' ' + accPill(ss.total ? ss.correct / ss.total : null) + '</span></div>';
+    }).join('') + '</div>' : '<div class="card explain">No practice rounds yet — the history will appear here.</div>';
+
+  return saveBanner() +
+    '<div class="tilerow">' +
+    '<div class="tile"><div class="v">' + state.items.length + '</div><div class="l">words (all senses)</div></div>' +
+    '<div class="tile"><div class="v">' + d.today + '</div><div class="l">due now</div></div>' +
+    '<div class="tile"><div class="v">' + mastered.length + '</div><div class="l">mastered (level 4+)</div></div>' +
+    '<div class="tile"><div class="v">' + struggling.length + '</div><div class="l">struggling (&lt;60%)</div></div>' +
+    '</div>' +
+    (focus.length ? '<div class="card"><h3 style="margin:0 0 4px;">Needs the most practice</h3><ul class="tricky">' +
+      focus.map(function(r){
+        return '<li><b>' + esc(r.it.word) + '</b> ' + accPill(r.a) + ' <span class="muted">level ' + r.s.box + ' &middot; ' + esc(r.it.meaning) + '</span></li>';
+      }).join('') + '</ul></div>' : '') +
+    typeHtml +
+    parentWordsCard() +
+    sessionsHtml +
+    '<div class="card"><h3 style="margin:0 0 6px;">New words</h3>' +
+    '<p class="explain">Words load from the <a href="' + SHEET_URL + '" target="_blank" rel="noopener" style="color:var(--brand);">Google Sheet</a> every time the page opens — add rows there and they show up here automatically. Jax meets ' + NEW_PER_DAY + ' new words a day.</p>' +
+    (lastSync && lastSync.needMeaning
+      ? '<p class="explain"><b>' + lastSync.needMeaning + ' rows in the sheet have no meaning yet</b>, so they are skipped. Fill in the Meaning column and they join the rotation.</p>' : '') +
+    '<div style="margin-top:6px;display:flex;gap:10px;align-items:center;">' +
+    '<button class="btn accent" data-act="sync">Check for new words</button>' +
+    '<span class="explain" id="sync-note">' + syncNote() + '</span></div></div>' +
+    '<p class="explain">How it works: every word starts at level 1. Each right answer moves it up a level and it rests longer (1, 3, 7, then 14 days). A miss sends it back to level 1 so it shows up again right away. ' +
+    (REMOTE ? 'Scores sync to the cloud, so any device with this link shows the same progress.'
+            : 'Scores are stored on this device — practice and check progress on the same device, or ask about cloud sync.') + '</p>';
+}
+
+function buildingView(){
+  return '<div class="card home-hero center">' +
+    '<div class="qask">Getting ready</div>' +
+    '<h1 style="margin:6px 0 10px; font-size:1.6rem;">Making your questions&hellip;</h1>' +
+    '<div class="pbar" style="max-width:260px;margin:0 auto 14px;"><div style="width:60%"></div></div>' +
+    '<p class="explain" style="margin:0 0 18px;">Fresh questions are being written for today&rsquo;s words.</p>' +
+    '<button class="btn" data-act="skip-gen">Start without waiting</button>' +
+    '</div>';
+}
+
+function render(){
+  var html = header();
+  if (view === 'home'){
+    if (summoning) html += summonView();
+    else if (awaitingRound) html += buildingView();
+    else if (session && !session.done)
+      html += (session.queue[session.idx] && session.queue[session.idx].mode === 'learn')
+        ? learnView() : quizView();
+    else if (session && session.done) html += endView();
+    else html += homeView();
+  } else if (view === 'words') html += wordsView();
+  else html += parentView();
+  root.innerHTML = html;
+  if (session && !session.done && session.q && session.q.type === 'scramble' && !session.answered) renderScramble();
+  watchClips();
+
+  var inp = document.getElementById('typed');
+  if (inp && !session.answered){
+    inp.focus();
+    inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') submitTyped(); });
+  }
+}
+
+/* scramble state */
+var scr = { picked: [] };
+function renderScramble(){
+  var q = session.q;
+  if (!scr.q || scr.q !== q){ scr = { q:q, picked: [] }; }
+  var slots = document.getElementById('slots'), tiles = document.getElementById('tiles');
+  if (!slots) return;
+  var word = q.answer;
+  slots.innerHTML = '';
+  for (var i=0; i<word.length; i++){
+    var d = document.createElement('div');
+    d.className = 'slot' + (i < scr.picked.length ? ' filled' : '');
+    d.textContent = i < scr.picked.length ? q.letters[scr.picked[i]] : '';
+    slots.appendChild(d);
+  }
+  tiles.innerHTML = '';
+  q.letters.forEach(function(ch, i){
+    var b = document.createElement('button');
+    b.className = 'tile-btn';
+    b.textContent = ch;
+    b.disabled = scr.picked.indexOf(i) >= 0;
+    b.addEventListener('click', function(){
+      if (session.answered) return;
+      scr.picked.push(i);
+      if (scr.picked.length === word.length){
+        var built = scr.picked.map(function(j){ return q.letters[j]; }).join('');
+        var ok = built === word;
+        renderScramble();
+        setTimeout(function(){ answer(ok, ok ? '' : 'You built “' + esc(built) + '”'); }, 250);
+      } else renderScramble();
+    });
+    tiles.appendChild(b);
+  });
+}
+
+function submitTyped(){
+  if (session.answered) return;
+  var inp = document.getElementById('typed');
+  if (!inp || !inp.value.trim()) return;
+  var res = checkTyped(inp.value, session.q.answer);
+  if (res.ok && !res.exact) answer(true, 'So close on spelling — it’s written “' + esc(session.q.answer) + '”');
+  else if (res.ok) answer(true, '');
+  else answer(false, 'You wrote “' + esc(inp.value.trim()) + '”');
+}
+
+function syncNote(){
+  if (!lastSync) return 'Checking the sheet…';
+  if (!lastSync.ok) return 'Couldn’t reach the sheet — using the words already here.';
+  return lastSync.added ? 'Added ' + lastSync.added + ' new ' + (lastSync.added === 1 ? 'entry' : 'entries') + '!' : 'Everything is up to date.';
+}
+
+/* Browsing controls update only their own list block, so typing in the search
+   box never re-renders (and never blurs) the input itself. */
+function refreshBrowse(key){
+  var el = document.getElementById('dyn-' + key);
+  if (!el) return;
+  el.innerHTML = key === 'words' ? wordsDyn() : parentWordsDyn();
+}
+root.addEventListener('input', function(e){
+  var key = e.target && e.target.dataset && e.target.dataset.bq;
+  if (!key || !browse[key]) return;
+  browse[key].q = e.target.value;
+  browse[key].limit = PAGE;
+  refreshBrowse(key);
+});
+root.addEventListener('change', function(e){
+  var key = e.target && e.target.dataset && e.target.dataset.bs;
+  if (!key || !browse[key]) return;
+  browse[key].sort = e.target.value;
+  browse[key].limit = PAGE;
+  refreshBrowse(key);
+});
+root.addEventListener('click', function(e){
+  var t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.view){
+    if (session && !session.done && !confirm('Leave this practice round?')) return;
+    if (session && !session.done) session = null;
+    view = t.dataset.view; render(); return;
+  }
+  if (t.dataset.bf){
+    var pf = t.dataset.bf.split(':');
+    if (browse[pf[0]]){ browse[pf[0]].f = pf[1]; browse[pf[0]].limit = PAGE; refreshBrowse(pf[0]); }
+    return;
+  }
+  if (t.dataset.bm){
+    if (browse[t.dataset.bm]){ browse[t.dataset.bm].limit += PAGE; refreshBrowse(t.dataset.bm); }
+    return;
+  }
+  var act = t.dataset.act;
+  if (act === 'summon'){ summoning = true; render(); confetti(); return; }
+  if (act === 'wish-done'){
+    summoning = false;
+    state.ki = Math.max(0, (state.ki || 0) - KI_PER_BALL * BALLS);
+    state.wishes = (state.wishes || 0) + 1;
+    saveLocal();
+    if (REMOTE) persist();
+    render();
+    return;
+  }
+  if (act === 'start'){ startSession(); return; }
+  if (act === 'skip-gen'){
+    var pend = awaitingRound; awaitingRound = null;
+    if (pend){ pend.state = 'skipped'; pend.questions = {}; launchRound(pend); }
+    return;
+  }
+  if (act === 'quit'){ if (confirm('Quit this round? Answered words still count.')) { session = null; render(); } return; }
+  if (act === 'next'){ session.idx++; session.feedback = null; nextQuestion(); return; }
+  if (act === 'submit-typed'){ submitTyped(); return; }
+  if (act === 'scr-undo'){ if (!session.answered && scr.picked.length){ scr.picked.pop(); renderScramble(); } return; }
+  if (act === 'finish'){ session = null; render(); return; }
+  if (act === 'save-now'){
+    t.disabled = true; t.textContent = 'Syncing…';
+    persist().then(function(r){
+      if (r.ok) render();
+      else { t.disabled = false; t.textContent = 'Try again'; }
+    });
+    return;
+  }
+  if (act === 'sync'){
+    t.disabled = true;
+    var note = document.getElementById('sync-note');
+    if (note) note.textContent = 'Checking the sheet…';
+    lastSync = null;
+    syncSheet().then(function(){
+      t.disabled = false;
+      var n = document.getElementById('sync-note');
+      if (n) n.textContent = syncNote();
+    });
+    return;
+  }
+  if (t.dataset.opt !== undefined && session && !session.answered){
+    var q = session.q;
+    session.chosen = Number(t.dataset.opt);
+    answer(q.options[session.chosen] === q.answer, '');
+  }
+});
+
+render();
+// Prefetch only after the sheet sync and cloud merge settle, so the round is
+// built from the current word list and the up-to-date review schedule.
+var ready = [syncSheet()];
+if (REMOTE){
+  ready.push(remoteLoad().then(function(remote){
+    var changed = mergeRemote(remote);
+    scrub(state);
+    if (changed){ saveLocal(); if (!session) render(); }
+    if (dirty) return persist().then(function(){ if (!session) render(); });
+  }).catch(function(){}));
+}
+Promise.all(ready).then(prefetchRound, prefetchRound);
+})();
+</script>
