@@ -280,7 +280,7 @@ var QCACHE = QGEN.Cache('word-dojo-qcache-v1', 14 * 86400000);
 var DAY = 86400000;
 var INTERVALS = [0, 1, 3, 7, 14];          // days until next review for box 1..5
 var SESSION_SIZE = 10;
-var NEW_PER_DAY = 5;   // brand-new words introduced per calendar day
+var NEW_PER_DAY = 3;   // brand-new words introduced per calendar day
 
 var state = JSON.parse(document.getElementById('app-state').textContent);
 var dirty = false;
@@ -511,8 +511,9 @@ function tokenMatches(tok, word){
   return false;
 }
 function findBlank(item){
-  if (!item.example) return null;
-  var toks = item.example.split(/(\s+)/);
+  var source = exampleFor(item);
+  if (!source) return null;
+  var toks = source.split(/(\s+)/);
   for (var i=0; i<toks.length; i++){
     if (tokenMatches(toks[i], item.word)){
       var before = toks.slice(0, i).join('');
@@ -601,7 +602,7 @@ function makeLocalQuestion(item){
 
 /* ---------- session ---------- */
 var session = null;
-/* Jax meets five brand-new words a day. The allowance is per calendar day
+/* Jax meets a few brand-new words a day (NEW_PER_DAY). The allowance is per calendar day
    rather than per round, so a second round on the same day is pure review and
    he is never shown more than five unfamiliar words in a day. */
 function todayKey(){
@@ -652,11 +653,13 @@ function buildQueue(){
   newbies.forEach(function(it){ entries.push({ item: it, mode:'quiz', retry:false }); });
 
   // Early on there is little to review, which would leave a short round. Give
-  // the new words a second pass instead: the generator varies the question type,
-  // so a repeat is a different angle on the same word rather than a rerun.
+  // the new words extra passes instead: the question type varies each time, so a
+  // repeat is a different angle on the word rather than a rerun. Capped at three
+  // extra passes each, so a day with only one new word does not become that word
+  // ten times over.
   var scored = q.length + newbies.length;
   if (scored < SESSION_SIZE && newbies.length){
-    var extra = Math.min(SESSION_SIZE - scored, newbies.length * 2);
+    var extra = Math.min(SESSION_SIZE - scored, newbies.length * 3);
     for (var k = 0; k < extra; k++){
       entries.push({ item: newbies[k % newbies.length], mode:'quiz', retry:false, encore:true });
       scored++;
@@ -1340,7 +1343,7 @@ function quizView(){
       '<p class="sentence" style="font-weight:700;">' + esc(q.prompt) + '</p>' +
       '<div class="opts">' + q.options.map(function(o, i){ return optBtn(o, i, 'font-family:Fredoka,sans-serif;font-size:1.05rem;'); }).join('') + '</div>';
   } else if (q.type === 'blank'){
-    body = retry + '<div class="qask">Finish your sentence</div>' +
+    body = retry + '<div class="qask">Finish the sentence</div>' +
       '<p class="sentence">' + esc(q.blank.before) + ' <span class="blank">&nbsp;?&nbsp;</span>' + esc(q.blank.after) + '</p>' +
       '<p class="explain">Hint: ' + esc(item.meaning) + '</p>' +
       '<div class="typebox"><input id="typed" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type the word">' +
