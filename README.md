@@ -16,5 +16,22 @@ Static files (`index.html` + `generate.js`), no build step. See `DEPLOY.md` for 
 ## Credits
 
 Celebration clips are embedded from GIPHY's CDN rather than copied into this
-repo, and fall back to drawn SVG art if unreachable. Same set as Wesley's app —
-see that repo's README for the full list.
+repo. One is picked at random when a round ends, never repeating twice in a row;
+the celebratory ones are held back below 70% so the clip matches the message.
+A separate clip plays when the Dragon Balls are cashed in. If a clip cannot be
+reached, the app falls back to drawn SVG art so the screen still works offline.
+
+A clip may name a lighter GIPHY rendition when the full-size file is too heavy
+for a phone — the otter below is 18MB at full size and 1.4MB at 200w, which is
+the size it renders at anyway.
+
+- https://giphy.com/gifs/super-saiyan-UBB6f0hKhlShy
+- https://giphy.com/gifs/dragon-ball-z-goku-hxCB1Qf11SrU4
+- https://giphy.com/gifs/anime-dragon-goku-eUIb94IVB7pIBRoF0A
+- https://giphy.com/gifs/thumbs-up-goku-dragonball-z-11YMhfLfGoq5Gg
+- https://giphy.com/gifs/like-a-boss-125cxELHOpsLra
+- https://giphy.com/gifs/goku-dragon-ball-master-roshi-RihThkWxzFENW
+- https://giphy.com/gifs/good-job-congratulations-otter-ely3apij36BJhoZ234
+- https://giphy.com/gifs/moodman-quality-nice-work-VhWVAa7rUtT3xKX6Cd
+- https://giphy.com/gifs/americasgottalent-thumbs-up-agt-simon-cowell-3o72FcJmLzIdYJdmDe
+- https://giphy.com/gifs/anime-shenron-dragonballdaima-mD78vEbuQRibX0VJrH (dragon summon)

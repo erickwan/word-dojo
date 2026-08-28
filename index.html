@@ -824,12 +824,22 @@ var PW_CLIPS = [
   { id:'eUIb94IVB7pIBRoF0A', alt:'Unleashing energy' },
   { id:'11YMhfLfGoq5Gg',     alt:'Thumbs up',      winOnly:true },
   { id:'125cxELHOpsLra',     alt:'Like a boss',    winOnly:true },
-  { id:'RihThkWxzFENW',      alt:'Celebrating',    winOnly:true }
+  { id:'RihThkWxzFENW',      alt:'Celebrating',    winOnly:true },
+  { id:'ely3apij36BJhoZ234',  alt:'Good job',       winOnly:true,
+    webp:'200w.webp', gif:'giphy-downsized.gif' },   // full size is 18MB
+  { id:'VhWVAa7rUtT3xKX6Cd',  alt:'Nice work',      winOnly:true },
+  { id:'3o72FcJmLzIdYJdmDe',  alt:'Thumbs up from the judges', winOnly:true }
 ];
 var DRAGON_CLIP = { id:'mD78vEbuQRibX0VJrH', alt:'The dragon appears' };
 var LAST_CLIP_KEY = 'word-dojo-lastclip';
 
-function clipUrl(id, ext){ return 'https://media.giphy.com/media/' + id + '/giphy.' + ext; }
+/* Giphy serves several renditions per clip. Most are fine at full size, but a
+   long or high-framerate one can be tens of megabytes, so a clip may name a
+   lighter file. The scene renders about 200px tall, so 200w loses nothing. */
+function clipUrl(clip, ext){
+  var file = ext === 'webp' ? (clip.webp || 'giphy.webp') : (clip.gif || 'giphy.gif');
+  return 'https://media.giphy.com/media/' + clip.id + '/' + file;
+}
 
 function pickClip(pct){
   var pool = PW_CLIPS.filter(function(c){ return pct >= 0.7 || !c.winOnly; });
@@ -846,8 +856,8 @@ function pickClip(pct){
 function clipMarkup(clip, imgClass, fallbackHtml){
   return '<div class="clip-wrap">' +
     '<picture>' +
-      '<source srcset="' + clipUrl(clip.id, 'webp') + '" type="image/webp">' +
-      '<img class="clip-img ' + imgClass + '" src="' + clipUrl(clip.id, 'gif') + '" ' +
+      '<source srcset="' + clipUrl(clip, 'webp') + '" type="image/webp">' +
+      '<img class="clip-img ' + imgClass + '" src="' + clipUrl(clip, 'gif') + '" ' +
         'alt="' + clip.alt + '" decoding="async">' +
     '</picture>' +
     '<div class="clip-fallback" style="display:none;">' + fallbackHtml + '</div>' +
