@@ -306,6 +306,9 @@ scrub(state);
 if (typeof state.ki !== 'number') state.ki = 0;
 if (typeof state.newCount !== 'number') state.newCount = 0;
 if (typeof state.wishes !== 'number') state.wishes = 0;
+/* One-time refund (2026-08-28): launch-time charging burned a new-word slot for
+   a word that was never shown after an abandoned round. Inert from tomorrow on. */
+if (state.newDay === '2026-8-28' && state.newCount === 3) state.newCount = 2;
 
 function saveLocal(){
   try { state.savedAt = Date.now(); localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
@@ -656,15 +659,16 @@ function buildQueue(){
   newbies.forEach(function(it){ entries.push({ item: it, mode:'quiz', retry:false }); });
 
   // Early on there is little to review, which would leave a short round. Give
-  // the new words extra passes instead: the question type varies each time, so a
-  // repeat is a different angle on the word rather than a rerun. Capped at three
-  // extra passes each, so a day with only one new word does not become that word
-  // ten times over.
+  // the round's words extra passes instead: the question type varies each time,
+  // so a repeat is a different angle on the word rather than a rerun. New words
+  // come first in the rotation; capped at three extra passes each, so a day
+  // with only one word does not become that word ten times over.
   var scored = q.length + newbies.length;
-  if (scored < SESSION_SIZE && newbies.length){
-    var extra = Math.min(SESSION_SIZE - scored, newbies.length * 3);
+  var pool = newbies.concat(q);
+  if (scored < SESSION_SIZE && pool.length){
+    var extra = Math.min(SESSION_SIZE - scored, pool.length * 3);
     for (var k = 0; k < extra; k++){
-      entries.push({ item: newbies[k % newbies.length], mode:'quiz', retry:false, encore:true });
+      entries.push({ item: pool[k % pool.length], mode:'quiz', retry:false, encore:true });
       scored++;
     }
   }
@@ -719,7 +723,6 @@ function launchRound(round){
     types: {}, missed: {}, scored: [], done: false,
     gen: round.questions || {}, genState: round.state
   };
-  noteNewWordsShown(round.built.newCount);   // spend today's new-word allowance
   saveLocal();
   nextQuestion();
 }
@@ -745,6 +748,10 @@ function answer(correct, detail){
     if (!session.types[tk]) session.types[tk] = [0, 0];
     session.types[tk][1]++;
     if (correct) session.types[tk][0]++;
+    /* The daily new-word allowance is spent here, on the word's first-ever
+       answer, not when the round launches — a round quit partway must not
+       burn slots for words Jax never reached. */
+    if (!s.seen) noteNewWordsShown(1);
     s.seen++; s.last = Date.now();
     if (correct){
       s.correct++;
