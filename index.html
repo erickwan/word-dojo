@@ -127,7 +127,7 @@ ul.tricky{padding-left:0; list-style:none; margin:10px 0 0;}
 ul.tricky li{padding:8px 0; border-bottom:1px solid var(--line);}
 ul.tricky li:last-child{border-bottom:0;}
 ul.tricky b{font-family:Fredoka,sans-serif; font-weight:600;}
-/* --- list browsing toolbar (My words / Parent) --- */
+/* --- list browsing toolbar (My words / Progress) --- */
 .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0 6px;}
 .toolbar input.search{flex:1 1 190px; min-width:0; padding:9px 12px; border-radius:12px;
   border:2px solid var(--line); background:var(--surface2); color:var(--ink); font-family:inherit; font-size:.95rem;}
@@ -1295,7 +1295,7 @@ function posChip(pos){
 function header(){
   return '<header class="app"><div class="logo"><span class="mark">J</span> Word Dojo</div></header>' +
     '<nav class="tabs" role="tablist">' +
-    ['home:Practice', 'words:My words', 'parent:Parent'].map(function(t){
+    ['home:Practice', 'words:My words', 'parent:Progress'].map(function(t){
       var k = t.split(':');
       return '<button role="tab" data-view="' + k[0] + '" class="' + (view === k[0] ? 'on' : '') + '">' + k[1] + '</button>';
     }).join('') + '</nav>';
