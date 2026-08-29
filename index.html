@@ -1523,7 +1523,7 @@ function wordsDyn(){
 }
 
 /* ---------- 14-day progress chart ----------
-   Sequential violet ramp: the further a word has climbed, the stronger the
+   Sequential orange ramp: the further a word has climbed, the stronger the
    colour. Steps are chosen per theme against that theme's surface rather than
    flipped, and validated for adjacent separation (normal-vision dE ~24). */
 var LEVEL_BANDS = [
@@ -1669,7 +1669,7 @@ function progressChart(){
   }
 
   var note = distinct < 2
-    ? '<p class="explain" style="margin:6px 0 0;">Only today is recorded so far &mdash; the line fills in as she practises on more days.</p>'
+    ? '<p class="explain" style="margin:6px 0 0;">Only today is recorded so far &mdash; the line fills in as he practises on more days.</p>'
     : '';
 
   return '<div class="card">' +
