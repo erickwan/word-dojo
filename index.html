@@ -302,6 +302,9 @@ var PROFILE = { name:'Jax', age:'8 years old but reading and spelling well above
                 goal:'11-plus vocabulary', band:'upper-elementary' };
 var GEN_CFG = REMOTE ? { url: REMOTE.url, key: REMOTE.key } : null;
 var QCACHE = QGEN.Cache('word-dojo-qcache-v1', 14 * 86400000);
+// Two months of what each word has been asked, so a review can be told to do
+// something different. Device-local, like the question cache.
+var QASKS = QGEN.AskLog('word-dojo-asklog-v1', 4, 60 * 86400000);
 var DAY = 86400000;
 var INTERVALS = [0, 1, 3, 7, 14];          // days until next review for box 1..5
 var SESSION_SIZE = 10;
@@ -604,6 +607,7 @@ function makeQuestion(item, entry){
   if (session && session.gen && session.gen[item.id] && !(entry && (entry.retry || entry.encore))){
     var g = session.gen[item.id];
     QCACHE.consume(item.id);   // asked now, so the next review gets a new one
+    QASKS.note(item.id, g.type, g.prompt, g.options, g.answer);
     return { item:item, type:g.type, prompt:g.prompt, options: shuffle(g.options.slice()),
              answer:g.answer, teach:g.teach, why:g.why || {}, generated:true };
   }
@@ -618,13 +622,18 @@ function makeLocalQuestion(item){
   if (en){
     (en.quiz || []).forEach(function(t){ types.push(t.type, t.type); });   // authored usage questions, double weight
   }
-  var type = pick(types);
+  // Skip the angle this word was last asked from, so a fallback run does not
+  // hand back the question the student just had.
+  var lastType = QASKS.lastType(item.id);
+  var fresh = types.filter(function(t){ return t !== lastType; });
+  var type = pick(fresh.length ? fresh : types);
   var q = { item:item, type:type };
   if (type === 'syn' || type === 'ant' || type === 'cloze' || type === 'scen'){
     var authored = en.quiz.filter(function(t){ return t.type === type; })[0];
     q.prompt = authored.prompt || '';
     q.options = shuffle(authored.options.slice());
     q.answer = authored.answer;
+    QASKS.note(item.id, q.type, q.prompt, q.options, q.answer);
     return q;
   }
 
@@ -659,6 +668,8 @@ function makeLocalQuestion(item){
     q.letters = letters;
     q.answer = w;
   }
+  QASKS.note(item.id, q.type, q.prompt || (q.blank ? q.blank.before + '___' + q.blank.after : ''),
+             q.options, q.answer);
   return q;
 }
 
@@ -744,7 +755,7 @@ function prepareRound(){
   built.entries.forEach(function(e){
     if (e.mode !== 'quiz' || seenId[e.item.id]) return;
     seenId[e.item.id] = 1;
-    words.push({ item: e.item, history: st0(e.item.id) });
+    words.push({ item: e.item, history: st0(e.item.id), recent: QASKS.recent(e.item.id) });
   });
   round.promise = QGEN.generateCached(QCACHE, GEN_CFG, words, PROFILE).then(function(r){
     round.questions = r.questions || {};
