@@ -787,7 +787,7 @@ function launchRound(round){
   session = {
     queue: round.built.entries,
     idx: 0, total: round.built.total, firstTry: {}, streak: 0, bestStreak: 0,
-    types: {}, missed: {}, scored: [], done: false,
+    types: {}, missed: {}, mastered: {}, regressed: {}, scored: [], done: false,
     gen: round.questions || {}, genState: round.state
   };
   saveLocal();
@@ -820,14 +820,19 @@ function answer(correct, detail){
        burn slots for words Jax never reached. */
     if (!s.seen) noteNewWordsShown(1);
     s.seen++; s.last = Date.now();
+    // Crossing the mastered line (box 4) in either direction is reported
+    // per session on the parent dashboard.
+    var wasMastered = s.box >= 4;
     if (correct){
       s.correct++;
       s.box = Math.min(5, s.box + 1);
+      if (!wasMastered && s.box >= 4) session.mastered[item.id] = 1;
       s.due = startOfDay(Date.now()) + INTERVALS[s.box - 1] * DAY + 8*3600000;
       if (s.due <= Date.now()) s.due = Date.now() + DAY;
     } else {
       s.wrong++;
       s.box = 1;
+      if (wasMastered) session.regressed[item.id] = 1;
       s.due = Date.now();
       session.missed[item.id] = 1;
       session.queue.push({ item:item, mode:'quiz', retry:true });
@@ -843,7 +848,8 @@ function endSession(){
   var correct = session.scored.filter(Boolean).length;
   state.sessions.push({
     t: Date.now(), correct: correct, total: session.total,
-    types: session.types, missed: Object.keys(session.missed)
+    types: session.types, missed: Object.keys(session.missed),
+    mastered: Object.keys(session.mastered), regressed: Object.keys(session.regressed)
   });
   saveLocal();
   session.done = true;
