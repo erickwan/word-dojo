@@ -299,7 +299,13 @@ var REMOTE = {
 };
 var LS_KEY = 'word-dojo-state-v1';
 var PROFILE = { name:'Jax', age:'8 years old but reading and spelling well above his age',
-                goal:'11-plus vocabulary', band:'upper-elementary' };
+                goal:'11-plus vocabulary', band:'upper-elementary',
+  // His favourites, added to the shared settings questions are written around.
+  topics: [
+    'Minecraft - building, mining, mobs and survival',
+    'Mario and Luigi games',
+    'Spider-Man'
+  ] };
 var GEN_CFG = REMOTE ? { url: REMOTE.url, key: REMOTE.key } : null;
 var QCACHE = QGEN.Cache('word-dojo-qcache-v1', 14 * 86400000);
 // Two months of what each word has been asked, so a review can be told to do
