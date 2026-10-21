@@ -494,6 +494,25 @@ async function persist(){
   catch (e) { return { ok:false }; }
 }
 
+/* ---------- parent-boosted new words ----------
+   Word HQ can queue specific words to introduce next. The list only reorders
+   the unseen-word queue, so an entry for a word already practised is ignored
+   harmlessly, and a fetch failure just means the normal order. */
+var BOOST = [];
+function boostRank(w){
+  var i = BOOST.indexOf(String(w).toLowerCase().trim());
+  return i === -1 ? BOOST.length : i;
+}
+function loadBoost(){
+  if (!REMOTE) return Promise.resolve();
+  return fetch(REMOTE.url + '/rest/v1/word_boost?child=eq.' + REMOTE.row + '&select=words', { headers: remoteHeaders() })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){
+      BOOST = ((rows.length && rows[0].words) || []).map(function(w){ return String(w).toLowerCase().trim(); });
+    })
+    .catch(function(){});
+}
+
 /* ---------- word sync from the Google Sheet ---------- */
 var lastSync = null;
 function normWord(w){
@@ -778,7 +797,11 @@ function buildQueue(){
   var newbies = [];
   var allowance = Math.min(newWordsLeftToday(), Math.max(0, SESSION_SIZE - q.length));
   if (allowance > 0){
-    newbies = state.items.filter(function(it){ return st0(it.id).seen === 0; }).slice(0, allowance);
+    newbies = state.items.filter(function(it){ return st0(it.id).seen === 0; })
+      // Parent-queued words jump to the front; the stable sort keeps sheet
+      // order for everything else.
+      .sort(function(a, b){ return boostRank(a.word) - boostRank(b.word); })
+      .slice(0, allowance);
   }
 
   // still short? top up with whatever is closest to being due
@@ -2072,7 +2095,7 @@ root.addEventListener('click', function(e){
 render();
 // Prefetch only after the sheet sync and cloud merge settle, so the round is
 // built from the current word list and the up-to-date review schedule.
-var ready = [syncSheet()];
+var ready = [syncSheet(), loadBoost()];
 if (REMOTE){
   ready.push(remoteLoad().then(function(remote){
     var changed = mergeRemote(remote);
