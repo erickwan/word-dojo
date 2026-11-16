@@ -888,13 +888,22 @@ function launchRound(round){
   saveLocal();
   nextQuestion();
 }
+var MAX_CARD_MS = 120000;   // a card left open longer than this was abandoned
+function noteTime(){
+  if (!session || !session.tick) return;
+  var d = Date.now() - session.tick;
+  session.activeMs = (session.activeMs || 0) + Math.min(Math.max(d, 0), MAX_CARD_MS);
+  session.tick = Date.now();
+}
 function nextQuestion(){
+  noteTime();
   if (session.idx >= session.queue.length){ endSession(); return; }
   var entry = session.queue[session.idx];
-  if (entry.mode === 'learn'){ session.q = null; session.answered = false; render(); return; }
+  if (entry.mode === 'learn'){ session.q = null; session.answered = false; session.tick = Date.now(); render(); return; }
   session.q = makeQuestion(entry.item, entry);
   session.answered = false;
   session.chosen = -1;
+  session.tick = Date.now();
   render();
 }
 function answer(correct, detail){
@@ -942,7 +951,7 @@ function answer(correct, detail){
 function endSession(){
   var correct = session.scored.filter(Boolean).length;
   state.sessions.push({
-    t: Date.now(), correct: correct, total: session.total,
+    t: Date.now(), correct: correct, total: session.total, ms: session.activeMs || 0,
     types: session.types, missed: Object.keys(session.missed),
     mastered: Object.keys(session.mastered), regressed: Object.keys(session.regressed)
   });
